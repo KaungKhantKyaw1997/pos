@@ -2,9 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:pos/api_constants.dart';
 import 'package:pos/routes.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
+import 'package:pos/src/services/categories_service.dart';
+import 'package:pos/src/services/items_service.dart';
 import 'package:pos/src/utils/format_amount.dart';
+import 'package:pos/src/utils/toast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -15,30 +19,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final categoriesService = CategoriesService();
+  final itemsService = ItemsService();
   final ScrollController _itemController = ScrollController();
-  List itemlist = [
-    {
-      "image": "assets/images/item1.png",
-      "name": "Latte",
-      "amount": "20000",
-      "totalamount": "0",
-      "counter": 0,
-    },
-    {
-      "image": "assets/images/item2.png",
-      "name": "Americano",
-      "amount": "25000",
-      "totalamount": "0",
-      "counter": 0,
-    },
-    {
-      "image": "assets/images/item3.png",
-      "name": "Espresso",
-      "amount": "30000",
-      "totalamount": "0",
-      "counter": 0,
-    }
-  ];
+  String search = '';
+  List items = [];
 
   @override
   void initState() {
@@ -49,6 +34,44 @@ class _HomeScreenState extends State<HomeScreen> {
   getData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("_currentIndex", "0");
+
+    getCategories();
+    getItems();
+  }
+
+  getCategories() async {
+    try {
+      final response = await categoriesService.getCategoriesData();
+      if (response["code"] == 200) {
+        if (response["data"].isNotEmpty) {}
+      } else {
+        ToastUtil.showToast(response["code"], response["message"]);
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  getItems() async {
+    try {
+      final response = await itemsService.getItemsData(search);
+      if (response["code"] == 200) {
+        if (response["data"].isNotEmpty) {
+          items = response["data"].map((item) {
+            return {
+              ...item,
+              "qty": 0,
+              "totalamount": "0.00",
+            };
+          }).toList();
+          setState(() {});
+        }
+      } else {
+        ToastUtil.showToast(response["code"], response["message"]);
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
   void showItemModal(context, index) {
@@ -70,167 +93,192 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: const EdgeInsets.only(
-                      top: 16,
-                      left: 16,
-                      right: 16,
-                      bottom: 24,
+                    padding: const EdgeInsets.all(
+                      16,
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          flex: 4,
-                          child: Container(
-                            width: 150,
-                            height: 150,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(
-                                    itemlist[index]["image"].toString()),
-                              ),
-                              shape: BoxShape.circle,
+                        Container(
+                          width: 120,
+                          height: 120,
+                          margin: const EdgeInsets.only(
+                            right: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(
+                                  '${ApiConstants.baseUrl}${items[index]["image_url"].toString()}'),
+                              fit: BoxFit.cover,
                             ),
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                         Expanded(
-                          flex: 8,
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        itemlist[index]["name"].toString(),
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                      FormattedAmount(
-                                        amount: double.parse(itemlist[index]
-                                                ["amount"]
-                                            .toString()),
-                                        mainTextStyle: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        decimalTextStyle: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      const Text(
-                                        "Total Amount",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                      FormattedAmount(
-                                        amount: double.parse(itemlist[index]
-                                                ["totalamount"]
-                                            .toString()),
-                                        mainTextStyle: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        decimalTextStyle: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 16,
-                              ),
                               Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'Quantity',
-                                    style: TextStyle(
+                                  Text(
+                                    items[index]["name"].toString(),
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text(
+                                    items[index]["description"].toString(),
+                                    style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400,
                                     ),
                                   ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.remove),
-                                        onPressed: () {
-                                          setState(() {
-                                            if (itemlist[index]["counter"] >
-                                                0) {
-                                              itemlist[index]["counter"]--;
-                                              itemlist[index]["totalamount"] =
-                                                  (double.parse(itemlist[index]
-                                                                  ["amount"]
-                                                              .toString()) *
-                                                          itemlist[index]
-                                                              ["counter"])
-                                                      .toString();
-                                            }
-                                          });
-                                        },
-                                      ),
-                                      SizedBox(
-                                        width: 30,
-                                        child: Text(
-                                          itemlist[index]["counter"].toString(),
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                            fontSize: 24,
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  top: 30,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          "Amount",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                        FormattedAmount(
+                                          amount: double.parse(
+                                              items[index]["price"].toString()),
+                                          mainTextStyle: const TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          decimalTextStyle: const TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16,
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.add),
-                                        onPressed: () {
-                                          setState(() {
-                                            itemlist[index]["counter"]++;
-                                            itemlist[index]["totalamount"] =
-                                                (double.parse(itemlist[index]
-                                                                ["amount"]
-                                                            .toString()) *
-                                                        itemlist[index]
-                                                            ["counter"])
-                                                    .toString();
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                      ],
+                                    ),
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        const Text(
+                                          "Total Amount",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                        FormattedAmount(
+                                          amount: double.parse(items[index]
+                                                  ["totalamount"]
+                                              .toString()),
+                                          mainTextStyle: const TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          decimalTextStyle: const TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(
+                    height: 0,
+                    color: Colors.grey,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      top: 16,
+                      bottom: 24,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'Quantity',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove),
+                              onPressed: () {
+                                setState(() {
+                                  if (items[index]["qty"] > 0) {
+                                    items[index]["qty"]--;
+                                    items[index]["totalamount"] = (double.parse(
+                                                items[index]["price"]
+                                                    .toString()) *
+                                            items[index]["qty"])
+                                        .toString();
+                                  }
+                                });
+                              },
+                            ),
+                            Text(
+                              items[index]["qty"].toString(),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.add),
+                              onPressed: () {
+                                setState(() {
+                                  items[index]["qty"]++;
+                                  items[index]["totalamount"] = (double.parse(
+                                              items[index]["price"]
+                                                  .toString()) *
+                                          items[index]["qty"])
+                                      .toString();
+                                });
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -277,12 +325,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       children: [
         Container(
-          width: 100,
-          height: 100,
+          width: 120,
+          height: 120,
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage(itemlist[index]["image"].toString()),
+              image: NetworkImage(
+                  '${ApiConstants.baseUrl}${items[index]["image_url"].toString()}'),
+              fit: BoxFit.cover,
             ),
+            borderRadius: BorderRadius.circular(10),
           ),
         ),
         const SizedBox(
@@ -290,7 +341,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         Center(
           child: Text(
-            itemlist[index]["name"].toString(),
+            items[index]["name"].toString(),
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
@@ -340,7 +391,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: GridView.builder(
           controller: _itemController,
           shrinkWrap: true,
-          itemCount: itemlist.length,
+          itemCount: items.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             mainAxisExtent: 150,
             childAspectRatio: 2 / 1,

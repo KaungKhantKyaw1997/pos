@@ -2,15 +2,19 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:pos/api_constants.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class LoginService {
-  Future<Map<String, dynamic>> loginData(Map<String, dynamic> body) async {
-    final response = await http.post(
-      Uri.parse(ApiConstants.loginUrl),
+class CategoriesService {
+  final storage = FlutterSecureStorage();
+
+  Future<Map<String, dynamic>> getCategoriesData() async {
+    var token = await storage.read(key: 'token');
+    final response = await http.get(
+      Uri.parse(ApiConstants.categoriesUrl),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token'
       },
-      body: jsonEncode(body),
     );
 
     if (response.statusCode == 200) {

@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
+import 'package:pos/src/services/auth_service.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -12,6 +13,7 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
+  final authService = AuthService();
   final ScrollController _itemController = ScrollController();
 
   showExitDialog() async {
@@ -78,7 +80,9 @@ class _SettingScreenState extends State<SettingScreen> {
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              onPressed: () async {},
+              onPressed: () async {
+                authService.logout(context);
+              },
             ),
           ],
         ),
