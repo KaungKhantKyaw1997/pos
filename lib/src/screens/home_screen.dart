@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pos/api_constants.dart';
@@ -22,28 +20,38 @@ class _HomeScreenState extends State<HomeScreen> {
   final categoriesService = CategoriesService();
   final itemsService = ItemsService();
   final ScrollController _itemController = ScrollController();
-  String search = '';
+  final PageController _categoryController = PageController(
+    viewportFraction: 0.5,
+  );
   List items = [];
+  List categories = [];
 
   @override
   void initState() {
     super.initState();
     getData();
+    getCategories();
+    getItems();
+  }
+
+  @override
+  void dispose() {
+    itemsService.cancelRequest();
+    super.dispose();
   }
 
   getData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("_currentIndex", "0");
-
-    getCategories();
-    getItems();
   }
 
   getCategories() async {
     try {
       final response = await categoriesService.getCategoriesData();
       if (response["code"] == 200) {
-        if (response["data"].isNotEmpty) {}
+        if (response["data"].isNotEmpty) {
+          categories = response["data"];
+        }
       } else {
         ToastUtil.showToast(response["code"], response["message"]);
       }
@@ -54,8 +62,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   getItems() async {
     try {
-      final response = await itemsService.getItemsData(search);
-      if (response["code"] == 200) {
+      final response = await itemsService.getItemsData('');
+      if (response!["code"] == 200) {
         if (response["data"].isNotEmpty) {
           items = response["data"].map((item) {
             return {
@@ -305,7 +313,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         // Navigator.pushNamed(context, Routes.home);
                       },
                       child: const Text(
-                        "Confirm",
+                        "Add to cart",
                         style: TextStyle(
                           fontWeight: FontWeight.w400,
                         ),
@@ -325,8 +333,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       children: [
         Container(
-          width: 120,
-          height: 120,
+          width: 150,
+          height: 150,
           decoration: BoxDecoration(
             image: DecorationImage(
               image: NetworkImage(
@@ -358,6 +366,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
+        elevation: 0,
         title: const Text(
           'POS',
           style: TextStyle(
@@ -382,31 +391,72 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 24,
-        ),
-        width: double.infinity,
-        child: GridView.builder(
-          controller: _itemController,
-          shrinkWrap: true,
-          itemCount: items.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            mainAxisExtent: 150,
-            childAspectRatio: 2 / 1,
-            crossAxisSpacing: 15,
-            crossAxisCount: 2,
-            mainAxisSpacing: 15,
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 24,
           ),
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                showItemModal(context, index);
-              },
-              child: itemCard(index),
-            );
-          },
+          width: double.infinity,
+          child: Column(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(
+                  bottom: 4,
+                ),
+                height: 50,
+                child: PageView.builder(
+                  scrollDirection: Axis.horizontal,
+                  controller: _categoryController,
+                  itemCount: categories.length,
+                  itemBuilder: (ctx, i) {
+                    return Card(
+                      elevation: 0.5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: GestureDetector(
+                        onTap: () {},
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 16,
+                          ),
+                          child: Text(
+                            categories[i]["name"],
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              GridView.builder(
+                controller: _itemController,
+                shrinkWrap: true,
+                itemCount: items.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  mainAxisExtent: 200,
+                  childAspectRatio: 2 / 1,
+                  crossAxisSpacing: 15,
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 15,
+                ),
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      showItemModal(context, index);
+                    },
+                    child: itemCard(index),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: const BottomBarScreen(),
