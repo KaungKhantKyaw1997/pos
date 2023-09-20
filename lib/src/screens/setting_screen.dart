@@ -96,6 +96,7 @@ class _SettingScreenState extends State<SettingScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
+        elevation: 0,
         title: const Text(
           'Setting',
           style: TextStyle(

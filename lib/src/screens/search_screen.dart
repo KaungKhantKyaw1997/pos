@@ -30,7 +30,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   getItems() async {
     try {
-      final response = await itemsService.getItemsData(search.text);
+      final response = await itemsService.getItemsData(search: search.text);
       if (response!["code"] == 200) {
         if (response["data"].isNotEmpty) {
           items = response["data"].map((item) {
@@ -334,6 +334,7 @@ class _SearchScreenState extends State<SearchScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
+        elevation: 0,
         title: TextField(
           controller: search,
           keyboardType: TextInputType.text,

@@ -10,12 +10,13 @@ class ItemsService {
   final Dio dio = Dio();
   CancelToken _cancelToken = CancelToken();
 
-  Future<Map<String, dynamic>?> getItemsData(String search) async {
+  Future<Map<String, dynamic>?> getItemsData(
+      {String search = "", int id = 0}) async {
     var token = await storage.read(key: 'token');
-
+    var categoryid = id != 0 ? '&category_id=$id' : '';
     try {
       final response = await dio.get(
-        '${ApiConstants.itemsUrl}?search=$search',
+        '${ApiConstants.itemsUrl}?search=$search$categoryid',
         options: Options(
           headers: {
             'Content-Type': 'application/json; charset=UTF-8',

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pos/api_constants.dart';
@@ -25,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   );
   List items = [];
   List categories = [];
+  int categoryid = 0;
 
   @override
   void initState() {
@@ -62,8 +65,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   getItems() async {
     try {
-      final response = await itemsService.getItemsData('');
+      final response = await itemsService.getItemsData(id: categoryid);
       if (response!["code"] == 200) {
+        items = [];
         if (response["data"].isNotEmpty) {
           items = response["data"].map((item) {
             return {
@@ -72,8 +76,8 @@ class _HomeScreenState extends State<HomeScreen> {
               "totalamount": "0.00",
             };
           }).toList();
-          setState(() {});
         }
+        setState(() {});
       } else {
         ToastUtil.showToast(response["code"], response["message"]);
       }
@@ -391,71 +395,81 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 24,
-          ),
-          width: double.infinity,
-          child: Column(
-            children: [
-              Container(
-                margin: const EdgeInsets.only(
-                  bottom: 4,
-                ),
-                height: 50,
-                child: PageView.builder(
-                  scrollDirection: Axis.horizontal,
-                  controller: _categoryController,
-                  itemCount: categories.length,
-                  itemBuilder: (ctx, i) {
-                    return Card(
-                      elevation: 0.5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: GestureDetector(
-                        onTap: () {},
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 12,
-                            horizontal: 16,
-                          ),
-                          child: Text(
-                            categories[i]["name"],
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
+      body: WillPopScope(
+        onWillPop: () => exit(0),
+        child: SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 24,
+            ),
+            width: double.infinity,
+            child: Column(
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(
+                    bottom: 4,
+                  ),
+                  height: 50,
+                  child: PageView.builder(
+                    scrollDirection: Axis.horizontal,
+                    controller: _categoryController,
+                    itemCount: categories.length,
+                    itemBuilder: (context, i) {
+                      final isSelected = categories[i]["id"] == categoryid;
+                      return Card(
+                        elevation: 0.5,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        color: isSelected
+                            ? Theme.of(context).primaryColorLight
+                            : Colors.white,
+                        child: GestureDetector(
+                          onTap: () {
+                            categoryid = categories[i]["id"];
+                            getItems();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 16,
+                            ),
+                            child: Text(
+                              categories[i]["name"],
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                              ),
                             ),
                           ),
                         ),
-                      ),
+                      );
+                    },
+                  ),
+                ),
+                GridView.builder(
+                  controller: _itemController,
+                  shrinkWrap: true,
+                  itemCount: items.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    mainAxisExtent: 200,
+                    childAspectRatio: 2 / 1,
+                    crossAxisSpacing: 15,
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 15,
+                  ),
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        showItemModal(context, index);
+                      },
+                      child: itemCard(index),
                     );
                   },
                 ),
-              ),
-              GridView.builder(
-                controller: _itemController,
-                shrinkWrap: true,
-                itemCount: items.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  mainAxisExtent: 200,
-                  childAspectRatio: 2 / 1,
-                  crossAxisSpacing: 15,
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 15,
-                ),
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      showItemModal(context, index);
-                    },
-                    child: itemCard(index),
-                  );
-                },
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
