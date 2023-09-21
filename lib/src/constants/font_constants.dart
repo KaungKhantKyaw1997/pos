@@ -31,6 +31,12 @@ class FontConstants {
     color: Colors.black,
   );
 
+  static const TextStyle caption3 = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: Colors.black,
+  );
+
   static const TextStyle smallText1 = TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w400,

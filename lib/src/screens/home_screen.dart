@@ -178,7 +178,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                               items[index]["price"].toString()),
                                           mainTextStyle:
                                               FontConstants.subheadline1,
-                                          decimalTextStyle: FontConstants.body1,
+                                          decimalTextStyle:
+                                              FontConstants.caption3,
                                         ),
                                       ],
                                     ),
@@ -198,7 +199,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                               .toString()),
                                           mainTextStyle:
                                               FontConstants.subheadline1,
-                                          decimalTextStyle: FontConstants.body1,
+                                          decimalTextStyle:
+                                              FontConstants.caption3,
                                         ),
                                       ],
                                     ),

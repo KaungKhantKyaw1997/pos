@@ -136,7 +136,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                               items[index]["price"].toString()),
                                           mainTextStyle:
                                               FontConstants.subheadline1,
-                                          decimalTextStyle: FontConstants.body1,
+                                          decimalTextStyle:
+                                              FontConstants.caption2,
                                         ),
                                       ],
                                     ),
@@ -156,7 +157,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                               .toString()),
                                           mainTextStyle:
                                               FontConstants.subheadline1,
-                                          decimalTextStyle: FontConstants.body1,
+                                          decimalTextStyle:
+                                              FontConstants.caption2,
                                         ),
                                       ],
                                     ),

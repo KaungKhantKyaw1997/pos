@@ -142,25 +142,77 @@ class _CartScreenState extends State<CartScreen> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          Container(
-                            margin: const EdgeInsets.only(
-                              left: 4,
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  carts[index]["name"].toString(),
-                                  style: FontConstants.body1,
-                                ),
-                                FormattedAmount(
-                                  amount: double.parse(
-                                      carts[index]["totalamount"].toString()),
-                                  mainTextStyle: FontConstants.subheadline1,
-                                  decimalTextStyle: FontConstants.body1,
-                                ),
-                              ],
+                          Expanded(
+                            child: Container(
+                              margin: const EdgeInsets.only(
+                                left: 4,
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${carts[index]["name"].toString()} x ${carts[index]["qty"].toString()}',
+                                    style: FontConstants.body1,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 14,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              language["Amount"] ?? "Amount",
+                                              style: FontConstants.caption1,
+                                            ),
+                                            FormattedAmount(
+                                              amount: double.parse(carts[index]
+                                                      ["price"]
+                                                  .toString()),
+                                              mainTextStyle:
+                                                  FontConstants.subheadline1,
+                                              decimalTextStyle:
+                                                  FontConstants.caption3,
+                                            ),
+                                          ],
+                                        ),
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              language["Total Amount"] ??
+                                                  "Total Amount",
+                                              style: FontConstants.caption1,
+                                            ),
+                                            FormattedAmount(
+                                              amount: double.parse(carts[index]
+                                                      ["totalamount"]
+                                                  .toString()),
+                                              mainTextStyle:
+                                                  FontConstants.subheadline1,
+                                              decimalTextStyle:
+                                                  FontConstants.caption3,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           )
                         ],
