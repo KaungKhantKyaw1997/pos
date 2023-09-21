@@ -137,7 +137,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                           mainTextStyle:
                                               FontConstants.subheadline1,
                                           decimalTextStyle:
-                                              FontConstants.caption2,
+                                              FontConstants.caption3,
                                         ),
                                       ],
                                     ),
@@ -158,7 +158,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                           mainTextStyle:
                                               FontConstants.subheadline1,
                                           decimalTextStyle:
-                                              FontConstants.caption2,
+                                              FontConstants.caption3,
                                         ),
                                       ],
                                     ),
