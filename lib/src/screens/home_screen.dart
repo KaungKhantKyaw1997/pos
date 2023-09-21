@@ -420,7 +420,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemBuilder: (context, i) {
                       final isSelected = categories[i]["id"] == categoryid;
                       return Card(
-                        elevation: 0.5,
+                        elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),

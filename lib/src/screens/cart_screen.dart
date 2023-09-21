@@ -22,7 +22,7 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   final orderService = OrderService();
   final ScrollController _cartController = ScrollController();
-  List carts = [];
+  List<Map<String, dynamic>> carts = [];
   List items = [];
   int tableid = 1;
 
@@ -37,15 +37,15 @@ class _CartScreenState extends State<CartScreen> {
     final cartsJson = prefs.getString("carts");
     if (cartsJson != null) {
       setState(() {
-        final jsonData = jsonDecode(cartsJson);
-        carts = jsonData;
-        for (var item in carts) {
+        List jsonData = jsonDecode(cartsJson) ?? [];
+        for (var item in jsonData) {
           Map<String, dynamic> cart = {
             'item_id': item["id"],
             'quantity': item["qty"],
             'special_instructions': '',
           };
 
+          carts.add(item);
           items.add(cart);
         }
       });
@@ -67,6 +67,16 @@ class _CartScreenState extends State<CartScreen> {
     } catch (e) {
       print('Error: $e');
     }
+  }
+
+  Future<void> saveListToSharedPreferences(
+      List<Map<String, dynamic>> datalist) async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = "carts";
+
+    final jsonData = jsonEncode(datalist);
+
+    await prefs.setString(key, jsonData);
   }
 
   @override
@@ -122,10 +132,22 @@ class _CartScreenState extends State<CartScreen> {
                       key: const ValueKey(0),
                       endActionPane: ActionPane(
                         motion: const ScrollMotion(),
-                        dismissible: DismissiblePane(onDismissed: () {}),
+                        dismissible: DismissiblePane(onDismissed: () {
+                          carts.removeAt(index);
+                          saveListToSharedPreferences(carts);
+                          for (var item in carts) {
+                            Map<String, dynamic> cart = {
+                              'item_id': item["id"],
+                              'quantity': item["qty"],
+                              'special_instructions': '',
+                            };
+
+                            items.add(cart);
+                          }
+                        }),
                         children: [
                           SlidableAction(
-                            onPressed: (context) {},
+                            onPressed: (BuildContext context) {},
                             backgroundColor: const Color(0xFFFE4A49),
                             foregroundColor: Colors.white,
                             borderRadius: BorderRadius.circular(10),
