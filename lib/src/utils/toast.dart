@@ -9,7 +9,7 @@ class ToastUtil {
       gravity: ToastGravity.BOTTOM,
       backgroundColor: Colors.black.withOpacity(0.7),
       textColor: Colors.white,
-      fontSize: 16.0,
+      fontSize: 16,
     );
   }
 }

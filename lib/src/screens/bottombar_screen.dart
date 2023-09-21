@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:pos/global.dart';
+import 'package:pos/src/constants/font_constants.dart';
 import 'package:pos/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,8 +15,9 @@ class BottomBarScreen extends StatefulWidget {
 class _BottomBarScreenState extends State<BottomBarScreen> {
   List navItems = [
     {"index": 0, "icon": "assets/icons/home.svg", "label": "Home"},
-    {"index": 1, "icon": "assets/icons/history.svg", "label": "History"},
-    {"index": 2, "icon": "assets/icons/setting.svg", "label": "Setting"}
+    {"index": 1, "icon": "assets/icons/history.svg", "label": "Cart"},
+    {"index": 2, "icon": "assets/icons/history.svg", "label": "History"},
+    {"index": 3, "icon": "assets/icons/setting.svg", "label": "Setting"}
   ];
 
   Future<void> _onTabSelected(int index) async {
@@ -24,6 +27,8 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
     var data = navItems[index];
     if (data["label"] == 'Home') {
       Navigator.pushNamed(context, Routes.home);
+    } else if (data["label"] == 'Cart') {
+      Navigator.pushNamed(context, Routes.cart);
     } else if (data["label"] == 'History') {
       Navigator.pushNamed(context, Routes.history);
     } else if (data["label"] == 'Setting') {
@@ -55,8 +60,8 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
               backgroundColor: Theme.of(context).primaryColor,
               selectedItemColor: Colors.white,
               unselectedItemColor: Colors.grey,
-              selectedFontSize: 10,
-              unselectedFontSize: 10,
+              selectedFontSize: FontConstants.bottom,
+              unselectedFontSize: FontConstants.bottom,
               selectedLabelStyle: const TextStyle(
                 fontWeight: FontWeight.w400,
               ),
@@ -73,7 +78,7 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
                     width: 24,
                     height: 24,
                   ),
-                  label: navItem["label"],
+                  label: language[navItem["label"]] ?? navItem["label"],
                 );
               }).toList(),
             ),

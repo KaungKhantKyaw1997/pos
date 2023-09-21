@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:pos/global.dart';
+import 'package:pos/src/constants/font_constants.dart';
 import 'package:pos/routes.dart';
 import 'package:pos/src/services/auth_service.dart';
 import 'package:pos/src/utils/toast.dart';
@@ -65,8 +67,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   shape: BoxShape.circle,
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.only(
+              Padding(
+                padding: const EdgeInsets.only(
                   left: 16,
                   right: 16,
                   bottom: 4,
@@ -74,11 +76,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "User Name",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    language["User Name"] ?? "User Name",
+                    style: FontConstants.caption1,
                   ),
                 ),
               ),
@@ -92,10 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: username,
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.next,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w400,
-                  ),
+                  style: FontConstants.body1,
                   cursorColor: Colors.black,
                   decoration: InputDecoration(
                     contentPadding: const EdgeInsets.symmetric(
@@ -129,14 +125,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Enter User Name';
+                      return language["Enter User Name"] ?? "Enter User Name";
                     }
                     return null;
                   },
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.only(
+              Padding(
+                padding: const EdgeInsets.only(
                   left: 16,
                   right: 16,
                   bottom: 4,
@@ -144,11 +140,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "Password",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    language["Password"] ?? "Password",
+                    style: FontConstants.caption1,
                   ),
                 ),
               ),
@@ -163,10 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.done,
                   obscureText: obscurePassword,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w400,
-                  ),
+                  style: FontConstants.body1,
                   cursorColor: Colors.black,
                   decoration: InputDecoration(
                     contentPadding: const EdgeInsets.symmetric(
@@ -221,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Enter Password';
+                      return language["Enter Password"] ?? "Enter Password";
                     }
                     return null;
                   },
@@ -248,11 +238,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       login();
                     }
                   },
-                  child: const Text(
-                    "Confirm",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                    ),
+                  child: Text(
+                    language["Login"] ?? "Login",
+                    style: FontConstants.button1,
                   ),
                 ),
               ),

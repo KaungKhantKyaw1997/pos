@@ -1,5 +1,25 @@
 {
+    "Home": "Home",
+    "Cart": "Cart",
+    "History": "History",
+    "Setting": "Setting",
+    "General Info": "General Info",
+    "User Name": "User Name",
+    "Enter User Name": "Enter User Name",
+    "Password": "Password",
+    "Enter Password": "Enter Password",
     "Login": "Login",
-    "User ID": "User ID",
-    "Password": "Password"
+    "Logout": "Logout",
+    "Confirm": "Confirm",
+    "Search": "Search",
+    "Language": "Language",
+    "English": "English",
+    "Myanmar": "Myanmar",
+    "Amount": "Amount",
+    "Total Amount": "Total Amount",
+    "Quantity": "Quantity",
+    "Add to cart": "Add to cart",
+    "Cancel": "Cancel",
+    "Ok": "Ok",
+    "Are you sure you want to logout?": "Are you sure you want to logout?"
 }

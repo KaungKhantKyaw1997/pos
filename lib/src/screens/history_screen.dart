@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pos/src/constants/font_constants.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -18,10 +19,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         elevation: 0,
         title: const Text(
           'History',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w400,
-          ),
+          style: FontConstants.title1,
         ),
       ),
       bottomNavigationBar: const BottomBarScreen(),

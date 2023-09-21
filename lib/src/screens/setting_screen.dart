@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:pos/global.dart';
+import 'package:pos/src/constants/font_constants.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
 import 'package:pos/src/services/auth_service.dart';
 
@@ -27,19 +29,14 @@ class _SettingScreenState extends State<SettingScreen> {
         ),
         child: AlertDialog(
           backgroundColor: Theme.of(context).primaryColorLight,
-          title: const Text(
-            "Log Out",
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-            ),
+          title: Text(
+            language["Logout"] ?? "Logout",
+            style: FontConstants.body1,
           ),
-          content: const Text(
-            "Are you sure you want to log out?",
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-            ),
+          content: Text(
+            language["Are you sure you want to logout?"] ??
+                "Are you sure you want to logout?",
+            style: FontConstants.caption2,
           ),
           actions: [
             TextButton(
@@ -51,12 +48,8 @@ class _SettingScreenState extends State<SettingScreen> {
                 ),
               ),
               child: Text(
-                "Cancel",
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                ),
+                language["Cancel"] ?? "Cancel",
+                style: FontConstants.smallText2,
               ),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -72,13 +65,9 @@ class _SettingScreenState extends State<SettingScreen> {
                 backgroundColor: MaterialStateProperty.all<Color>(
                     Theme.of(context).primaryColor),
               ),
-              child: const Text(
-                "Ok",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                ),
+              child: Text(
+                language["Ok"] ?? "Ok",
+                style: FontConstants.smallText3,
               ),
               onPressed: () async {
                 authService.logout(context);
@@ -97,12 +86,9 @@ class _SettingScreenState extends State<SettingScreen> {
         backgroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,
-        title: const Text(
-          'Setting',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w400,
-          ),
+        title: Text(
+          language["Setting"] ?? "Setting",
+          style: FontConstants.title1,
         ),
       ),
       body: SingleChildScrollView(
@@ -115,18 +101,15 @@ class _SettingScreenState extends State<SettingScreen> {
           width: double.infinity,
           child: Column(
             children: [
-              const Padding(
-                padding: EdgeInsets.only(
+              Padding(
+                padding: const EdgeInsets.only(
                   bottom: 8,
                 ),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "General Info",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    language["General Info"] ?? "General Info",
+                    style: FontConstants.smallText1,
                   ),
                 ),
               ),
@@ -159,9 +142,9 @@ class _SettingScreenState extends State<SettingScreen> {
                                 height: 24,
                               ),
                             ),
-                            const Expanded(
+                            Expanded(
                               child: Padding(
-                                padding: EdgeInsets.only(
+                                padding: const EdgeInsets.only(
                                   right: 16,
                                   top: 16,
                                   bottom: 16,
@@ -170,11 +153,9 @@ class _SettingScreenState extends State<SettingScreen> {
                                   TextSpan(
                                     children: [
                                       TextSpan(
-                                        text: "Language",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                        ),
+                                        text:
+                                            language["Language"] ?? "Language",
+                                        style: FontConstants.caption2,
                                       )
                                     ],
                                   ),
@@ -189,10 +170,7 @@ class _SettingScreenState extends State<SettingScreen> {
                               ),
                               child: Text(
                                 "English",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                ),
+                                style: FontConstants.caption1,
                               ),
                             ),
                             const Icon(
@@ -223,13 +201,10 @@ class _SettingScreenState extends State<SettingScreen> {
                     top: 24,
                     bottom: 16,
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Text(
-                      "Log out",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                      ),
+                      language["Logout"] ?? "Logout",
+                      style: FontConstants.caption2,
                     ),
                   ),
                 ),

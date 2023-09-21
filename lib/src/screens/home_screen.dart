@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:pos/api_constants.dart';
+import 'package:pos/global.dart';
+import 'package:pos/src/constants/api_constants.dart';
+import 'package:pos/src/constants/font_constants.dart';
 import 'package:pos/routes.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
 import 'package:pos/src/services/categories_service.dart';
@@ -138,17 +140,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 children: [
                                   Text(
                                     items[index]["name"].toString(),
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    style: FontConstants.body1,
                                   ),
                                   Text(
                                     items[index]["description"].toString(),
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                    ),
+                                    style: FontConstants.caption1,
                                   ),
                                 ],
                               ),
@@ -167,26 +163,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        const Text(
-                                          "Amount",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                          ),
+                                        Text(
+                                          language["Amount"] ?? "Amount",
+                                          style: FontConstants.caption1,
                                         ),
                                         FormattedAmount(
                                           amount: double.parse(
                                               items[index]["price"].toString()),
-                                          mainTextStyle: const TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          decimalTextStyle: const TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          mainTextStyle:
+                                              FontConstants.subheadline1,
+                                          decimalTextStyle: FontConstants.body1,
                                         ),
                                       ],
                                     ),
@@ -195,27 +181,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.end,
                                       children: [
-                                        const Text(
-                                          "Total Amount",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                          ),
+                                        Text(
+                                          language["Total Amount"] ??
+                                              "Total Amount",
+                                          style: FontConstants.caption1,
                                         ),
                                         FormattedAmount(
                                           amount: double.parse(items[index]
                                                   ["totalamount"]
                                               .toString()),
-                                          mainTextStyle: const TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          decimalTextStyle: const TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          mainTextStyle:
+                                              FontConstants.subheadline1,
+                                          decimalTextStyle: FontConstants.body1,
                                         ),
                                       ],
                                     ),
@@ -243,12 +220,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Quantity',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                          ),
+                        Text(
+                          language["Quantity"] ?? "Quantity",
+                          style: FontConstants.caption1,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -272,10 +246,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Text(
                               items[index]["qty"].toString(),
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: FontConstants.headline1,
                             ),
                             IconButton(
                               icon: const Icon(Icons.add),
@@ -316,11 +287,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () {
                         // Navigator.pushNamed(context, Routes.home);
                       },
-                      child: const Text(
-                        "Add to cart",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                        ),
+                      child: Text(
+                        language["Add to cart"] ?? "Add to cart",
+                        style: FontConstants.button1,
                       ),
                     ),
                   ),
@@ -354,10 +323,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Center(
           child: Text(
             items[index]["name"].toString(),
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-            ),
+            style: FontConstants.body1,
           ),
         ),
       ],
@@ -371,12 +337,9 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,
-        title: const Text(
-          'POS',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w400,
-          ),
+        title: Text(
+          language["Home"] ?? "Home",
+          style: FontConstants.title1,
         ),
         actions: [
           IconButton(
@@ -384,8 +347,8 @@ class _HomeScreenState extends State<HomeScreen> {
               "assets/icons/search.svg",
               width: 24,
               height: 24,
-              colorFilter: ColorFilter.mode(
-                Theme.of(context).primaryColor,
+              colorFilter: const ColorFilter.mode(
+                Colors.black,
                 BlendMode.srcIn,
               ),
             ),
@@ -437,10 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             child: Text(
                               categories[i]["name"],
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                              ),
+                              style: FontConstants.caption2,
                             ),
                           ),
                         ),

@@ -1,5 +1,25 @@
 {
-    "Login": "Login",
-    "User ID": "User ID",
-    "Password": "Password"
+    "Home": "ပင်မစာမျက်နှ",
+    "Cart": "စျေးဝယ်ခြင်း",
+    "History": "မှတ်တမ်း",
+    "Setting": "ဆက်တင်",
+    "General Info": "အချက်အလက်များ",
+    "User Name": "အသုံးပြုသူအမည်",
+    "Enter User Name": "အသုံးပြုသူအမည်ထည့်ပါ",
+    "Password": "စကားဝှက်",
+    "Enter Password": "စကားဝှက်ထည့်ပါ",
+    "Login": "ဝင်ရောက်မည်",
+    "Logout": "ထွက်မည်",
+    "Confirm": "အတည်ပြုမည်",
+    "Search": "ရှာမည်",
+    "Language": "ဘာသာစကား",
+    "English": "အင်္ဂလိပ်",
+    "Myanmar": "မြန်မာ",
+    "Amount": "ငွေပမာဏ",
+    "Total Amount": "စုစုပေါင်း ငွေပမာဏ",
+    "Quantity": "အရေအတွက်",
+    "Add to cart": "စျေးဝယ်ခြင်းထဲသို့ထည့်ရန်",
+    "Cancel": "မလုပ်တော့ဘူး",
+    "Ok": "အိုကေ",
+    "Are you sure you want to logout?": "ထွက်မည်ဆိုသလား?"
 }

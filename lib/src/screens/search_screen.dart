@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pos/api_constants.dart';
+import 'package:pos/global.dart';
+import 'package:pos/src/constants/api_constants.dart';
+import 'package:pos/src/constants/font_constants.dart';
 import 'package:pos/src/services/items_service.dart';
 import 'package:pos/src/utils/format_amount.dart';
 import 'package:pos/src/utils/toast.dart';
@@ -102,17 +104,11 @@ class _SearchScreenState extends State<SearchScreen> {
                                 children: [
                                   Text(
                                     items[index]["name"].toString(),
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    style: FontConstants.body1,
                                   ),
                                   Text(
                                     items[index]["description"].toString(),
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                    ),
+                                    style: FontConstants.caption1,
                                   ),
                                 ],
                               ),
@@ -131,26 +127,16 @@ class _SearchScreenState extends State<SearchScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        const Text(
-                                          "Amount",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                          ),
+                                        Text(
+                                          language["Amount"] ?? "Amount",
+                                          style: FontConstants.caption1,
                                         ),
                                         FormattedAmount(
                                           amount: double.parse(
                                               items[index]["price"].toString()),
-                                          mainTextStyle: const TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          decimalTextStyle: const TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          mainTextStyle:
+                                              FontConstants.subheadline1,
+                                          decimalTextStyle: FontConstants.body1,
                                         ),
                                       ],
                                     ),
@@ -159,27 +145,18 @@ class _SearchScreenState extends State<SearchScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.end,
                                       children: [
-                                        const Text(
-                                          "Total Amount",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                          ),
+                                        Text(
+                                          language["Total Amount"] ??
+                                              "Total Amount",
+                                          style: FontConstants.caption1,
                                         ),
                                         FormattedAmount(
                                           amount: double.parse(items[index]
                                                   ["totalamount"]
                                               .toString()),
-                                          mainTextStyle: const TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          decimalTextStyle: const TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          mainTextStyle:
+                                              FontConstants.subheadline1,
+                                          decimalTextStyle: FontConstants.body1,
                                         ),
                                       ],
                                     ),
@@ -207,12 +184,9 @@ class _SearchScreenState extends State<SearchScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Quantity',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                          ),
+                        Text(
+                          language["Quantity"] ?? "Quantity",
+                          style: FontConstants.caption1,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -236,10 +210,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             Text(
                               items[index]["qty"].toString(),
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: FontConstants.headline1,
                             ),
                             IconButton(
                               icon: const Icon(Icons.add),
@@ -280,11 +251,9 @@ class _SearchScreenState extends State<SearchScreen> {
                       onPressed: () {
                         // Navigator.pushNamed(context, Routes.home);
                       },
-                      child: const Text(
-                        "Add to cart",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                        ),
+                      child: Text(
+                        language["Add to cart"] ?? "Add to cart",
+                        style: FontConstants.button1,
                       ),
                     ),
                   ),
@@ -318,10 +287,7 @@ class _SearchScreenState extends State<SearchScreen> {
         Center(
           child: Text(
             items[index]["name"].toString(),
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-            ),
+            style: FontConstants.caption2,
           ),
         ),
       ],
@@ -340,12 +306,10 @@ class _SearchScreenState extends State<SearchScreen> {
           keyboardType: TextInputType.text,
           textInputAction: TextInputAction.done,
           autofocus: true,
-          style: const TextStyle(
-            fontWeight: FontWeight.w400,
-          ),
+          style: FontConstants.body1,
           cursorColor: Colors.black,
           decoration: InputDecoration(
-            hintText: 'Search...',
+            hintText: language["Search"] ?? "Search",
             filled: true,
             fillColor: Colors.white,
             contentPadding: const EdgeInsets.symmetric(
