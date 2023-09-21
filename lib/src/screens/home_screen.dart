@@ -328,7 +328,6 @@ class _HomeScreenState extends State<HomeScreen> {
         items[index]["totalamount"] = 0;
       }
     });
-    ;
   }
 
   Future<void> saveListToSharedPreferences(

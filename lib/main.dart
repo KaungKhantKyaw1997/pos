@@ -6,10 +6,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pos/global.dart';
 import 'package:pos/palette.dart';
 import 'package:pos/routes.dart';
+import 'package:pos/src/models/table_selection_model.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => TableSelectionModel(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {

@@ -6,10 +6,13 @@ import 'package:flutter_svg/svg.dart';
 import 'package:pos/global.dart';
 import 'package:pos/src/constants/api_constants.dart';
 import 'package:pos/src/constants/font_constants.dart';
+import 'package:pos/src/models/table_selection_model.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
 import 'package:pos/src/services/orders_service.dart';
+import 'package:pos/src/services/tables_service.dart';
 import 'package:pos/src/utils/format_amount.dart';
 import 'package:pos/src/utils/toast.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CartScreen extends StatefulWidget {
@@ -20,16 +23,25 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  final tablesService = TablesService();
   final orderService = OrderService();
   final ScrollController _cartController = ScrollController();
   List<Map<String, dynamic>> carts = [];
   List items = [];
-  int tableid = 1;
+  List tables = [];
+  int tableid = 0;
 
   @override
   void initState() {
     super.initState();
     getCart();
+    getTables();
+  }
+
+  @override
+  void dispose() {
+    tablesService.cancelRequest();
+    super.dispose();
   }
 
   getCart() async {
@@ -52,7 +64,23 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
+  getTables() async {
+    try {
+      final response = await tablesService.getTablesData();
+      if (response!["code"] == 200) {
+        if (response["data"].isNotEmpty) {
+          tables = response["data"];
+        }
+      } else {
+        ToastUtil.showToast(response["code"], response["message"]);
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
   createOrder() async {
+    final prefs = await SharedPreferences.getInstance();
     try {
       final body = {
         "table_id": tableid,
@@ -60,6 +88,11 @@ class _CartScreenState extends State<CartScreen> {
       };
       final response = await orderService.createOrderData(body);
       if (response["code"] == 200) {
+        setState(() {
+          carts = [];
+          items = [];
+          prefs.remove("carts");
+        });
         ToastUtil.showToast(response["code"], response["message"]);
       } else {
         ToastUtil.showToast(response["code"], response["message"]);
@@ -77,6 +110,94 @@ class _CartScreenState extends State<CartScreen> {
     final jsonData = jsonEncode(datalist);
 
     await prefs.setString(key, jsonData);
+  }
+
+  void _showTableSelectionBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        final tableSelectionModel =
+            Provider.of<TableSelectionModel>(context, listen: true);
+
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+          ),
+          height: double.infinity,
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: tables.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    int tableNumber = tables[index]["table_number"];
+                    return ListTile(
+                      title: Text(
+                        'Table $tableNumber',
+                        style: FontConstants.body1,
+                      ),
+                      trailing:
+                          tableSelectionModel.selectedTableId == tableNumber
+                              ? SvgPicture.asset(
+                                  "assets/icons/check.svg",
+                                  width: 24,
+                                  height: 24,
+                                  colorFilter: const ColorFilter.mode(
+                                    Colors.black,
+                                    BlendMode.srcIn,
+                                  ),
+                                )
+                              : null,
+                      onTap: () {
+                        tableSelectionModel.selectTable(tableNumber);
+                      },
+                    );
+                  },
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  bottom: 32,
+                ),
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    backgroundColor: Theme.of(context).primaryColor,
+                  ),
+                  onPressed: () async {
+                    tableid = tableSelectionModel.selectedTableId;
+                    Navigator.pop(context);
+                    createOrder();
+                  },
+                  child: Text(
+                    language["Order"] ?? "Order",
+                    style: FontConstants.button1,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    ).whenComplete(() {
+      final tableSelectionModel =
+          Provider.of<TableSelectionModel>(context, listen: false);
+      tableSelectionModel.selectTable(0);
+    });
   }
 
   @override
@@ -102,7 +223,7 @@ class _CartScreenState extends State<CartScreen> {
               ),
             ),
             onPressed: () {
-              createOrder();
+              _showTableSelectionBottomSheet(context);
             },
           ),
         ],

@@ -9,7 +9,7 @@ class CategoriesService {
   CancelToken _cancelToken = CancelToken();
 
   Future<Map<String, dynamic>?> getCategoriesData() async {
-    var token = await storage.read(key: 'token');
+    var token = await storage.read(key: "token");
     try {
       final response = await dio.get(
         ApiConstants.categoriesUrl,

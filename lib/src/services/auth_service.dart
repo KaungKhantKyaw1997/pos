@@ -29,7 +29,7 @@ class AuthService {
   logout(BuildContext context) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.clear();
-    await storage.delete(key: 'token');
+    await storage.delete(key: "token");
     Navigator.pushNamed(context, Routes.login);
   }
 }

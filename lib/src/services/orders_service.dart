@@ -13,7 +13,7 @@ class OrderService {
 
   Future<Map<String, dynamic>> createOrderData(
       Map<String, dynamic> body) async {
-    var token = await storage.read(key: 'token');
+    var token = await storage.read(key: "token");
     final response = await http.post(
       Uri.parse(ApiConstants.ordersUrl),
       headers: <String, String>{
@@ -31,7 +31,7 @@ class OrderService {
   }
 
   Future<Map<String, dynamic>?> getOrdersData() async {
-    var token = await storage.read(key: 'token');
+    var token = await storage.read(key: "token");
     try {
       final response = await dio.get(
         ApiConstants.ordersUrl,
@@ -56,7 +56,7 @@ class OrderService {
   }
 
   Future<Map<String, dynamic>?> getOrdersDetailData(int id) async {
-    var token = await storage.read(key: 'token');
+    var token = await storage.read(key: "token");
     try {
       final response = await dio.get(
         '${ApiConstants.ordersUrl}/$id/details',
