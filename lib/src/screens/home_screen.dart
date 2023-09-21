@@ -61,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
         if (response["data"].isNotEmpty) {
           categories = response["data"];
         }
+        setState(() {});
       } else {
         ToastUtil.showToast(response["code"], response["message"]);
       }
