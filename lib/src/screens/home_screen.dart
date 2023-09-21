@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -29,7 +30,9 @@ class _HomeScreenState extends State<HomeScreen> {
   );
   List items = [];
   List categories = [];
+  List<Map<String, dynamic>> carts = [];
   int categoryid = 0;
+  bool addtocart = false;
 
   @override
   void initState() {
@@ -42,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     itemsService.cancelRequest();
+    categoriesService.cancelRequest();
     super.dispose();
   }
 
@@ -53,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
   getCategories() async {
     try {
       final response = await categoriesService.getCategoriesData();
-      if (response["code"] == 200) {
+      if (response!["code"] == 200) {
         if (response["data"].isNotEmpty) {
           categories = response["data"];
         }
@@ -75,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
             return {
               ...item,
               "qty": 0,
-              "totalamount": "0.00",
+              "totalamount": 0,
             };
           }).toList();
         }
@@ -89,6 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void showItemModal(context, index) {
+    addtocart = items[index]["qty"] != 0 ? true : false;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -284,8 +289,23 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         backgroundColor: Theme.of(context).primaryColor,
                       ),
-                      onPressed: () {
-                        // Navigator.pushNamed(context, Routes.home);
+                      onPressed: () async {
+                        if (items[index]["qty"] != 0) {
+                          Map<String, dynamic> item = {
+                            'id': items[index]["id"],
+                            'image_url': items[index]["image_url"],
+                            'name': items[index]["name"],
+                            'description': items[index]["description"],
+                            'price': items[index]["price"],
+                            'qty': items[index]["qty"],
+                            'totalamount': items[index]["totalamount"],
+                          };
+
+                          carts.add(item);
+                          saveListToSharedPreferences(carts);
+                          addtocart = true;
+                          Navigator.pop(context);
+                        }
                       },
                       child: Text(
                         language["Add to cart"] ?? "Add to cart",
@@ -299,7 +319,23 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         );
       },
-    );
+    ).whenComplete(() {
+      if (!addtocart) {
+        items[index]["qty"] = 0;
+        items[index]["totalamount"] = 0;
+      }
+    });
+    ;
+  }
+
+  Future<void> saveListToSharedPreferences(
+      List<Map<String, dynamic>> datalist) async {
+    final prefs = await SharedPreferences.getInstance();
+    const key = "carts";
+
+    final jsonData = jsonEncode(datalist);
+
+    await prefs.setString(key, jsonData);
   }
 
   itemCard(index) {

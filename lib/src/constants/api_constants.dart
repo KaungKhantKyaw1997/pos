@@ -3,4 +3,5 @@ class ApiConstants {
   static const String loginUrl = '$baseUrl/api/auth/login';
   static const String categoriesUrl = '$baseUrl/api/categories';
   static const String itemsUrl = '$baseUrl/api/items';
+  static const String ordersUrl = '$baseUrl/api/orders';
 }

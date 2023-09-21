@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final response = await authService.loginData(body);
       if (response["code"] == 200) {
         prefs.setString("name", response["name"]);
-        await storage.write(key: 'token', value: response["token"]);
+        await storage.write(key: "token", value: response["token"]);
         Navigator.pushNamed(context, Routes.home);
       } else {
         ToastUtil.showToast(response["code"], response["message"]);

@@ -1,4 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:pos/global.dart';
+import 'package:pos/src/constants/api_constants.dart';
+import 'package:pos/src/constants/font_constants.dart';
+import 'package:pos/src/screens/bottombar_screen.dart';
+import 'package:pos/src/utils/format_amount.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -8,8 +17,130 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  final ScrollController _cartController = ScrollController();
+  List carts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getCart();
+  }
+
+  getCart() async {
+    final prefs = await SharedPreferences.getInstance();
+    final cartsJson = prefs.getString("carts");
+    if (cartsJson != null) {
+      setState(() {
+        final jsonData = jsonDecode(cartsJson);
+        carts = jsonData;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        elevation: 0,
+        title: Text(
+          language["Cart"] ?? "Cart",
+          style: FontConstants.title1,
+        ),
+        actions: [
+          IconButton(
+            icon: SvgPicture.asset(
+              "assets/icons/check.svg",
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(
+                Colors.black,
+                BlendMode.srcIn,
+              ),
+            ),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 24,
+          ),
+          width: double.infinity,
+          child: ListView.builder(
+            controller: _cartController,
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            itemCount: carts.length,
+            itemBuilder: (context, index) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Card(
+                    elevation: 0.5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    color: Colors.white,
+                    child: Container(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        top: 8,
+                        bottom: 8,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: NetworkImage(
+                                    '${ApiConstants.baseUrl}${carts[index]["image_url"].toString()}'),
+                                fit: BoxFit.cover,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.only(
+                              left: 4,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  carts[index]["name"].toString(),
+                                  style: FontConstants.body1,
+                                ),
+                                FormattedAmount(
+                                  amount: double.parse(
+                                      carts[index]["totalamount"].toString()),
+                                  mainTextStyle: FontConstants.subheadline1,
+                                  decimalTextStyle: FontConstants.body1,
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+      bottomNavigationBar: const BottomBarScreen(),
+    );
   }
 }

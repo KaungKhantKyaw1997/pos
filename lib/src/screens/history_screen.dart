@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pos/global.dart';
 import 'package:pos/src/constants/font_constants.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
 
@@ -17,8 +18,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
         backgroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,
-        title: const Text(
-          'History',
+        title: Text(
+          language["History"] ?? "History",
           style: FontConstants.title1,
         ),
       ),
