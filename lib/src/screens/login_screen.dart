@@ -29,8 +29,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       final body = {
-        'username': username.text,
-        'password': password.text,
+        "username": username.text,
+        "password": password.text,
       };
 
       final response = await authService.loginData(body);

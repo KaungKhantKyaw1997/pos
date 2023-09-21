@@ -6,7 +6,9 @@ import 'package:pos/global.dart';
 import 'package:pos/src/constants/api_constants.dart';
 import 'package:pos/src/constants/font_constants.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
+import 'package:pos/src/services/orders_service.dart';
 import 'package:pos/src/utils/format_amount.dart';
+import 'package:pos/src/utils/toast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CartScreen extends StatefulWidget {
@@ -17,8 +19,11 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  final orderService = OrderService();
   final ScrollController _cartController = ScrollController();
   List carts = [];
+  List items = [];
+  int tableid = 1;
 
   @override
   void initState() {
@@ -33,7 +38,33 @@ class _CartScreenState extends State<CartScreen> {
       setState(() {
         final jsonData = jsonDecode(cartsJson);
         carts = jsonData;
+        for (var item in carts) {
+          Map<String, dynamic> cart = {
+            'item_id': item["id"],
+            'quantity': item["qty"],
+            'special_instructions': '',
+          };
+
+          items.add(cart);
+        }
       });
+    }
+  }
+
+  createOrder() async {
+    try {
+      final body = {
+        "table_id": tableid,
+        "items": items,
+      };
+      final response = await orderService.createOrderData(body);
+      if (response["code"] == 200) {
+        ToastUtil.showToast(response["code"], response["message"]);
+      } else {
+        ToastUtil.showToast(response["code"], response["message"]);
+      }
+    } catch (e) {
+      print('Error: $e');
     }
   }
 
@@ -59,7 +90,9 @@ class _CartScreenState extends State<CartScreen> {
                 BlendMode.srcIn,
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              createOrder();
+            },
           ),
         ],
       ),
