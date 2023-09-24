@@ -3,7 +3,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:pos/global.dart';
 import 'package:pos/src/constants/font_constants.dart';
 import 'package:pos/routes.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pos/src/providers/bottom_provider.dart';
+import 'package:pos/src/providers/cart_provider.dart';
+import 'package:provider/provider.dart';
 
 class BottomBarScreen extends StatefulWidget {
   const BottomBarScreen({super.key});
@@ -15,15 +17,17 @@ class BottomBarScreen extends StatefulWidget {
 class _BottomBarScreenState extends State<BottomBarScreen> {
   List navItems = [
     {"index": 0, "icon": "assets/icons/home.svg", "label": "Home"},
-    {"index": 1, "icon": "assets/icons/history.svg", "label": "Cart"},
+    {"index": 1, "icon": "assets/icons/cart.svg", "label": "Cart"},
     {"index": 2, "icon": "assets/icons/history.svg", "label": "History"},
     {"index": 3, "icon": "assets/icons/setting.svg", "label": "Setting"}
   ];
 
   Future<void> _onTabSelected(int index) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    BottomProvider bottomProvider =
+        Provider.of<BottomProvider>(context, listen: false);
 
-    prefs.setString("currentIndex", index.toString());
+    bottomProvider.selectIndex(index);
+
     var data = navItems[index];
     if (data["label"] == 'Home') {
       Navigator.pushNamed(context, Routes.home);
@@ -38,55 +42,97 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<SharedPreferences>(
-      future: SharedPreferences.getInstance(),
-      builder:
-          (BuildContext context, AsyncSnapshot<SharedPreferences> snapshot) {
-        if (snapshot.hasData) {
-          final SharedPreferences? prefs = snapshot.data;
-          var currentIndex = 0;
-          var index = prefs!.getString("currentIndex");
-          if (index != null) {
-            currentIndex = int.parse(index);
-          }
-          return ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
-            ),
-            child: BottomNavigationBar(
-              currentIndex: currentIndex,
-              type: BottomNavigationBarType.fixed,
-              backgroundColor: Theme.of(context).primaryColor,
-              selectedItemColor: Colors.white,
-              unselectedItemColor: Colors.grey,
-              selectedFontSize: FontConstants.bottom,
-              unselectedFontSize: FontConstants.bottom,
-              selectedLabelStyle: const TextStyle(
-                fontWeight: FontWeight.w400,
-              ),
-              onTap: _onTabSelected,
-              items: navItems.map((navItem) {
-                return BottomNavigationBarItem(
-                  icon: SvgPicture.asset(
-                    navItem["icon"],
-                    colorFilter: ColorFilter.mode(
-                        navItem["index"] == currentIndex
-                            ? Colors.white
-                            : Colors.grey,
-                        BlendMode.srcIn),
-                    width: 24,
-                    height: 24,
-                  ),
-                  label: language[navItem["label"]] ?? navItem["label"],
-                );
-              }).toList(),
-            ),
-          );
-        } else {
-          return Text('Error: ${snapshot.error}');
-        }
-      },
-    );
+    CartProvider cartProvider =
+        Provider.of<CartProvider>(context, listen: true);
+
+    return Consumer<BottomProvider>(builder: (context, bottomProvider, child) {
+      return ClipRRect(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: bottomProvider.currentIndex,
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Theme.of(context).primaryColor,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.grey,
+          selectedFontSize: FontConstants.bottom,
+          unselectedFontSize: FontConstants.bottom,
+          selectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.w400,
+          ),
+          onTap: _onTabSelected,
+          items: navItems.map((navItem) {
+            return BottomNavigationBarItem(
+              icon: cartProvider.count > 0 && navItem["index"] == 1
+                  ? Stack(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 8,
+                            top: 8,
+                            right: 8,
+                          ),
+                          child: SvgPicture.asset(
+                            navItem["icon"],
+                            colorFilter: ColorFilter.mode(
+                              navItem["index"] == bottomProvider.currentIndex
+                                  ? Colors.white
+                                  : Colors.grey,
+                              BlendMode.srcIn,
+                            ),
+                            width: 24,
+                            height: 24,
+                          ),
+                        ),
+                        Positioned(
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE3200F),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 16,
+                              minHeight: 16,
+                            ),
+                            child: Text(
+                              '${cartProvider.count}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: FontConstants.bottom,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.only(
+                        left: 8,
+                        top: 8,
+                        right: 8,
+                      ),
+                      child: SvgPicture.asset(
+                        navItem["icon"],
+                        colorFilter: ColorFilter.mode(
+                          navItem["index"] == bottomProvider.currentIndex
+                              ? Colors.white
+                              : Colors.grey,
+                          BlendMode.srcIn,
+                        ),
+                        width: 24,
+                        height: 24,
+                      ),
+                    ),
+              label: language[navItem["label"]] ?? navItem["label"],
+            );
+          }).toList(),
+        ),
+      );
+    });
   }
 }

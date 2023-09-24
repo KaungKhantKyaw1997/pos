@@ -7,11 +7,13 @@ import 'package:pos/global.dart';
 import 'package:pos/src/constants/api_constants.dart';
 import 'package:pos/src/constants/font_constants.dart';
 import 'package:pos/routes.dart';
+import 'package:pos/src/providers/cart_provider.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
 import 'package:pos/src/services/categories_service.dart';
 import 'package:pos/src/services/items_service.dart';
 import 'package:pos/src/utils/format_amount.dart';
 import 'package:pos/src/utils/toast.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -37,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    getData();
+    getCart();
     getCategories();
     getItems();
   }
@@ -49,9 +51,17 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  getData() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("_currentIndex", "0");
+  getCart() async {
+    final prefs = await SharedPreferences.getInstance();
+    final cartsJson = prefs.getString("carts");
+    if (cartsJson != null) {
+      setState(() {
+        List jsonData = jsonDecode(cartsJson) ?? [];
+        for (var item in jsonData) {
+          carts.add(item);
+        }
+      });
+    }
   }
 
   getCategories() async {
@@ -307,6 +317,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           carts.add(item);
                           saveListToSharedPreferences(carts);
                           addtocart = true;
+
+                          CartProvider cartProvider =
+                              Provider.of<CartProvider>(context, listen: false);
+                          cartProvider.addCount(carts.length);
+
                           Navigator.pop(context);
                         }
                       },

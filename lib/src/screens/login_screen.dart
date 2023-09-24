@@ -6,8 +6,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:pos/global.dart';
 import 'package:pos/src/constants/font_constants.dart';
 import 'package:pos/routes.dart';
+import 'package:pos/src/providers/bottom_provider.dart';
+import 'package:pos/src/providers/cart_provider.dart';
 import 'package:pos/src/services/auth_service.dart';
 import 'package:pos/src/utils/toast.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -37,6 +40,15 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response["code"] == 200) {
         prefs.setString("name", response["name"]);
         await storage.write(key: "token", value: response["token"]);
+
+        CartProvider cartProvider =
+            Provider.of<CartProvider>(context, listen: false);
+        cartProvider.addCount(0);
+
+        BottomProvider bottomProvider =
+            Provider.of<BottomProvider>(context, listen: false);
+        bottomProvider.selectIndex(0);
+
         Navigator.pushNamed(context, Routes.home);
       } else {
         ToastUtil.showToast(response["code"], response["message"]);
