@@ -6,7 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:pos/global.dart';
 import 'package:pos/src/constants/api_constants.dart';
 import 'package:pos/src/constants/font_constants.dart';
-import 'package:pos/src/models/table_selection_model.dart';
+import 'package:pos/src/providers/table_provider.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
 import 'package:pos/src/services/orders_service.dart';
 import 'package:pos/src/services/tables_service.dart';
@@ -118,8 +118,8 @@ class _CartScreenState extends State<CartScreen> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        final tableSelectionModel =
-            Provider.of<TableSelectionModel>(context, listen: true);
+        TableProvider tableProvider =
+            Provider.of<TableProvider>(context, listen: true);
 
         return Container(
           decoration: const BoxDecoration(
@@ -142,20 +142,19 @@ class _CartScreenState extends State<CartScreen> {
                         'Table $tableNumber',
                         style: FontConstants.body1,
                       ),
-                      trailing:
-                          tableSelectionModel.selectedTableId == tableNumber
-                              ? SvgPicture.asset(
-                                  "assets/icons/check.svg",
-                                  width: 24,
-                                  height: 24,
-                                  colorFilter: const ColorFilter.mode(
-                                    Colors.black,
-                                    BlendMode.srcIn,
-                                  ),
-                                )
-                              : null,
+                      trailing: tableProvider.tableId == tableNumber
+                          ? SvgPicture.asset(
+                              "assets/icons/check.svg",
+                              width: 24,
+                              height: 24,
+                              colorFilter: const ColorFilter.mode(
+                                Colors.black,
+                                BlendMode.srcIn,
+                              ),
+                            )
+                          : null,
                       onTap: () {
-                        tableSelectionModel.selectTable(tableNumber);
+                        tableProvider.selectId(tableNumber);
                       },
                     );
                   },
@@ -180,7 +179,7 @@ class _CartScreenState extends State<CartScreen> {
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
                   onPressed: () async {
-                    tableid = tableSelectionModel.selectedTableId;
+                    tableid = tableProvider.tableId;
                     Navigator.pop(context);
                     createOrder();
                   },
@@ -195,9 +194,9 @@ class _CartScreenState extends State<CartScreen> {
         );
       },
     ).whenComplete(() {
-      final tableSelectionModel =
-          Provider.of<TableSelectionModel>(context, listen: false);
-      tableSelectionModel.selectTable(0);
+      TableProvider tableProvider =
+          Provider.of<TableProvider>(context, listen: false);
+      tableProvider.selectId(0);
     });
   }
 

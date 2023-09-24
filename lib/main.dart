@@ -8,7 +8,7 @@ import 'package:pos/palette.dart';
 import 'package:pos/routes.dart';
 import 'package:pos/src/providers/bottom_provider.dart';
 import 'package:pos/src/providers/cart_provider.dart';
-import 'package:pos/src/models/table_selection_model.dart';
+import 'package:pos/src/providers/table_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,7 +18,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (context) => BottomProvider()),
         ChangeNotifierProvider(create: (context) => CartProvider()),
-        ChangeNotifierProvider(create: (context) => TableSelectionModel()),
+        ChangeNotifierProvider(create: (context) => TableProvider()),
       ],
       child: MyApp(),
     ),
