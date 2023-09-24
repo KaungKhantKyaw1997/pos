@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pos/global.dart';
+import 'package:pos/routes.dart';
 import 'package:pos/src/constants/font_constants.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
 import 'package:pos/src/services/orders_service.dart';
@@ -38,20 +39,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
         if (response["data"].isNotEmpty) {
           List data = response["data"];
 
-          final groupedItems = groupBy(data, (item) => item["table_number"]);
-          final groupedItemsMap = Map.from(groupedItems);
-
-          groupedItemsMap.forEach((tableNumber, items) {
-            orders.add({
-              "title": tableNumber,
-              "items": items,
-            });
+          final groupedItemsMap = groupBy(data, (item) {
+            final createdAt = item["created_at"].toString();
+            return createdAt.split('T')[0];
           });
 
-          orders.sort((a, b) {
-            final int tableNumberA = a["title"];
-            final int tableNumberB = b["title"];
-            return tableNumberA.compareTo(tableNumberB);
+          groupedItemsMap.forEach((date, items) {
+            orders.add({
+              "date": date,
+              "items": items,
+            });
           });
         }
         setState(() {});
@@ -69,12 +66,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   String formatTimestamp(String timestamp) {
     final dateTime = DateTime.parse(timestamp);
-    final formattedDate = DateFormat.yMMMd().add_jm().format(dateTime);
-    return formattedDate;
+    final formattedTime = DateFormat("hh:mm a").format(dateTime);
+    return formattedTime;
   }
 
   @override
   Widget build(BuildContext context) {
+    String currentDate =
+        DateFormat("dd/MM/yyyy").format(DateTime.now()).toString();
+    String yesterdayDate = DateFormat("dd/MM/yyyy")
+        .format(DateTime.now().subtract(const Duration(days: 1)))
+        .toString();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -98,6 +101,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
             shrinkWrap: true,
             itemCount: orders.length,
             itemBuilder: (context, index) {
+              String formattedDate = DateFormat("dd/MM/yyyy")
+                  .format(DateTime.parse(orders[index]["date"].toString()));
+
               return Container(
                 margin: const EdgeInsets.only(
                   bottom: 8,
@@ -118,7 +124,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         bottom: 4,
                       ),
                       child: Text(
-                        'Table ${orders[index]["title"]}',
+                        currentDate == formattedDate
+                            ? "Today"
+                            : yesterdayDate == formattedDate
+                                ? "Yesterday"
+                                : formattedDate,
                         style: FontConstants.body1,
                       ),
                     ),
@@ -132,47 +142,68 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       shrinkWrap: true,
                       itemCount: orders[index]["items"].length,
                       itemBuilder: (context, i) {
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.only(
-                                left: 16,
-                                right: 16,
-                                bottom: 8,
-                                top: 8,
-                              ),
-                              color: Colors.transparent,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'ORD-${formatNumber(orders[index]["items"][i]["id"])}',
-                                    style: FontConstants.body1,
-                                  ),
-                                  Text(
-                                    formatTimestamp(orders[index]["items"][i]
-                                            ["created_at"]
-                                        .toString()),
-                                    style: FontConstants.caption1,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            i < orders[index]["items"].length - 1
-                                ? Container(
-                                    padding: const EdgeInsets.only(
-                                      left: 16,
-                                      right: 16,
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              Routes.history_details,
+                              arguments: {
+                                "id": orders[index]["items"][i]["id"],
+                              },
+                            );
+                          },
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.only(
+                                  left: 16,
+                                  right: 16,
+                                  bottom: 8,
+                                  top: 8,
+                                ),
+                                color: Colors.transparent,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'ORD-${formatNumber(orders[index]["items"][i]["id"])}',
+                                          style: FontConstants.body1,
+                                        ),
+                                        Text(
+                                          formatTimestamp(orders[index]["items"]
+                                                  [i]["created_at"]
+                                              .toString()),
+                                          style: FontConstants.caption1,
+                                        ),
+                                      ],
                                     ),
-                                    child: const Divider(
-                                      height: 0,
-                                      color: Colors.grey,
+                                    Text(
+                                      'Table ${orders[index]["items"][i]["table_number"]}',
+                                      style: FontConstants.caption2,
                                     ),
-                                  )
-                                : Container(),
-                          ],
+                                  ],
+                                ),
+                              ),
+                              i < orders[index]["items"].length - 1
+                                  ? Container(
+                                      padding: const EdgeInsets.only(
+                                        left: 16,
+                                        right: 16,
+                                      ),
+                                      child: const Divider(
+                                        height: 0,
+                                        color: Colors.grey,
+                                      ),
+                                    )
+                                  : Container(),
+                            ],
+                          ),
                         );
                       },
                     ),

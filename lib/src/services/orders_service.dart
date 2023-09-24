@@ -55,7 +55,7 @@ class OrderService {
     }
   }
 
-  Future<Map<String, dynamic>?> getOrdersDetailData(int id) async {
+  Future<Map<String, dynamic>?> getOrderDetailsData(int id) async {
     var token = await storage.read(key: "token");
     try {
       final response = await dio.get(
