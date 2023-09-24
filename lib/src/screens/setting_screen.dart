@@ -28,7 +28,7 @@ class _SettingScreenState extends State<SettingScreen> {
           sigmaY: 5,
         ),
         child: AlertDialog(
-          backgroundColor: Theme.of(context).primaryColorLight,
+          backgroundColor: Colors.white,
           title: Text(
             language["Logout"] ?? "Logout",
             style: FontConstants.body1,
@@ -116,7 +116,7 @@ class _SettingScreenState extends State<SettingScreen> {
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: Theme.of(context).primaryColorLight,
+                  color: Colors.white,
                 ),
                 padding: const EdgeInsets.only(
                   left: 16,
@@ -191,7 +191,7 @@ class _SettingScreenState extends State<SettingScreen> {
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Theme.of(context).primaryColorLight,
+                    color: Colors.white,
                   ),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 32,
