@@ -23,5 +23,11 @@
     "Order": "Order",
     "Cancel": "Cancel",
     "Ok": "Ok",
-    "Are you sure you want to logout?": "Are you sure you want to logout?"
+    "Are you sure you want to logout?": "Are you sure you want to logout?",
+    "Name": "Name",
+    "Table No.": "Table No.",
+    "Order No.": "Order No.",
+    "Date": "Date",
+    "Time": "Time",
+    "Order Information": "Order Information"
 }

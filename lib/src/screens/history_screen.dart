@@ -61,7 +61,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   String formatNumber(int number) {
-    return number.toString().padLeft(6, '0');
+    return 'ORD-${number.toString().padLeft(6, '0')}';
   }
 
   String formatTimestamp(String timestamp) {
@@ -172,7 +172,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          'ORD-${formatNumber(orders[index]["items"][i]["id"])}',
+                                          formatNumber(
+                                              orders[index]["items"][i]["id"]),
                                           style: FontConstants.body1,
                                         ),
                                         Text(
@@ -184,7 +185,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                       ],
                                     ),
                                     Text(
-                                      'Table ${orders[index]["items"][i]["table_number"]}',
+                                      '${language["Table No."] ?? "Table No."} ${orders[index]["items"][i]["table_number"]}',
                                       style: FontConstants.caption2,
                                     ),
                                   ],

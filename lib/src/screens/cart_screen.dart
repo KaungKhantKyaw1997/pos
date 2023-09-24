@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:pos/global.dart';
 import 'package:pos/src/constants/api_constants.dart';
 import 'package:pos/src/constants/font_constants.dart';
+import 'package:pos/src/providers/cart_provider.dart';
 import 'package:pos/src/providers/table_provider.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
 import 'package:pos/src/services/orders_service.dart';
@@ -88,6 +89,10 @@ class _CartScreenState extends State<CartScreen> {
       };
       final response = await orderService.createOrderData(body);
       if (response["code"] == 200) {
+        CartProvider cartProvider =
+            Provider.of<CartProvider>(context, listen: false);
+        cartProvider.addCount(0);
+
         setState(() {
           carts = [];
           items = [];
@@ -139,7 +144,7 @@ class _CartScreenState extends State<CartScreen> {
                     int tableNumber = tables[index]["table_number"];
                     return ListTile(
                       title: Text(
-                        'Table $tableNumber',
+                        '${language["Table No."] ?? "Table No."} $tableNumber',
                         style: FontConstants.body1,
                       ),
                       trailing: tableProvider.tableId == tableNumber
@@ -400,6 +405,10 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                       onPressed: () async {
                         if (carts[index]["qty"] == 0) {
+                          CartProvider cartProvider =
+                              Provider.of<CartProvider>(context, listen: false);
+                          cartProvider.addCount(cartProvider.count - 1);
+
                           carts.removeAt(index);
                         }
                         saveListToSharedPreferences(carts);
@@ -412,6 +421,7 @@ class _CartScreenState extends State<CartScreen> {
 
                           items.add(cart);
                         }
+
                         Navigator.pop(context);
                       },
                       child: Text(
@@ -441,20 +451,22 @@ class _CartScreenState extends State<CartScreen> {
           style: FontConstants.title1,
         ),
         actions: [
-          IconButton(
-            icon: SvgPicture.asset(
-              "assets/icons/check.svg",
-              width: 24,
-              height: 24,
-              colorFilter: const ColorFilter.mode(
-                Colors.black,
-                BlendMode.srcIn,
-              ),
-            ),
-            onPressed: () {
-              _showTableSelectionBottomSheet(context);
-            },
-          ),
+          carts.isNotEmpty
+              ? IconButton(
+                  icon: SvgPicture.asset(
+                    "assets/icons/check.svg",
+                    width: 24,
+                    height: 24,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.black,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  onPressed: () {
+                    _showTableSelectionBottomSheet(context);
+                  },
+                )
+              : Container(),
         ],
       ),
       body: SingleChildScrollView(
@@ -505,6 +517,11 @@ class _CartScreenState extends State<CartScreen> {
                         children: [
                           SlidableAction(
                             onPressed: (BuildContext context) {
+                              CartProvider cartProvider =
+                                  Provider.of<CartProvider>(context,
+                                      listen: false);
+                              cartProvider.addCount(cartProvider.count - 1);
+
                               carts.removeAt(index);
                               saveListToSharedPreferences(carts);
                               for (var item in carts) {
