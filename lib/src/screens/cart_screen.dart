@@ -110,6 +110,7 @@ class _CartScreenState extends State<CartScreen> {
     final jsonData = jsonEncode(datalist);
 
     await prefs.setString(key, jsonData);
+    setState(() {});
   }
 
   void _showTableSelectionBottomSheet(BuildContext context) {
