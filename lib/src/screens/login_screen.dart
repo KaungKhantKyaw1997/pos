@@ -74,9 +74,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 300,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('assets/images/logo.png'),
+                    image: AssetImage('assets/images/login.png'),
                   ),
                   shape: BoxShape.circle,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  bottom: 4,
+                ),
+                child: Text(
+                  "Welcome to POS",
+                  textAlign: TextAlign.center,
+                  style: FontConstants.headline1,
                 ),
               ),
               Padding(
