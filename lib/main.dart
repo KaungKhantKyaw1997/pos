@@ -1,16 +1,12 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pos/global.dart';
 import 'package:pos/palette.dart';
 import 'package:pos/routes.dart';
 import 'package:pos/src/providers/bottom_provider.dart';
 import 'package:pos/src/providers/cart_provider.dart';
 import 'package:pos/src/providers/table_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(
@@ -23,6 +19,11 @@ void main() {
       child: MyApp(),
     ),
   );
+
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]);
 }
 
 class MyApp extends StatefulWidget {
@@ -36,47 +37,46 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    loadLanguageData();
-  }
-
-  Future<void> loadLanguageData() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    var lang = prefs.getString("language") ?? "eng";
-    if (lang == 'eng') {
-      selectedLangIndex = 0;
-    } else {
-      selectedLangIndex = 1;
-    }
-
-    try {
-      final response =
-          await rootBundle.loadString('assets/languages/$lang.json');
-      final dynamic data = json.decode(response);
-      if (data is Map<String, dynamic>) {
-        setState(() {
-          language = data.cast<String, String>();
-        });
-      }
-    } catch (e) {
-      print('Error loading language data: $e');
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'POS',
       theme: ThemeData(
         primarySwatch: Palette.kToDark,
         scaffoldBackgroundColor: Color(0xFFF1F3F6),
-        textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
+        textTheme:
+            GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme).copyWith(
+          displayLarge: GoogleFonts.poppins(
+            fontSize: 48,
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
+          ),
+          bodyMedium: GoogleFonts.poppins(
+            fontSize: 24,
+            fontWeight: FontWeight.w400,
+            color: Colors.black,
+          ),
+          bodySmall: GoogleFonts.poppins(
+            fontSize: 24,
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
+          labelMedium: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: Colors.grey,
+          ),
+        ),
         dialogTheme: DialogTheme(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
         ),
       ),
-      initialRoute: Routes.login,
+      initialRoute: Routes.splash,
       routes: Routes.routes,
     );
   }
