@@ -106,13 +106,12 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
       child: Row(
         children: [
           Expanded(
-            flex: 3,
+            flex: 5,
             child: Container(
               margin: EdgeInsets.only(
                 right: 8,
               ),
-              width: 100,
-              height: 100,
+              height: 140,
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: NetworkImage(
@@ -285,7 +284,7 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
                 shrinkWrap: true,
                 itemCount: items.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  mainAxisExtent: 130,
+                  mainAxisExtent: 170,
                   crossAxisSpacing: 16,
                   crossAxisCount: MediaQuery.of(context).orientation ==
                           Orientation.landscape
