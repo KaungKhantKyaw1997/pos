@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pos/global.dart';
+import 'package:pos/routes.dart';
 import 'package:pos/src/constants/api_constants.dart';
 import 'package:pos/src/constants/color_constants.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
@@ -29,7 +32,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final orderService = OrderService();
   TextEditingController search = TextEditingController();
   FocusNode _searchFocusNode = FocusNode();
-  Color _searchBorderColor = ColorConstants.borderColor;
   final ScrollController _scrollController = ScrollController();
   List items = [];
   List categories = [];
@@ -44,13 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _searchFocusNode.addListener(() {
-      setState(() {
-        _searchBorderColor = _searchFocusNode.hasFocus
-            ? Theme.of(context).primaryColor
-            : ColorConstants.borderColor;
-      });
-    });
     getCart();
     getCategories();
     getItems();
@@ -60,8 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _searchFocusNode.dispose();
-    itemsService.cancelRequest();
-    categoriesService.cancelRequest();
     super.dispose();
   }
 
@@ -101,7 +94,29 @@ class _HomeScreenState extends State<HomeScreen> {
         ToastUtil.showToast(response["code"], response["message"]);
       }
     } catch (e) {
-      print('Error: $e');
+      if (e is DioException &&
+          e.error is SocketException &&
+          !isConnectionTimeout) {
+        isConnectionTimeout = true;
+        Navigator.pushNamed(
+          context,
+          Routes.connection_timeout,
+        );
+        return;
+      }
+      if (e is DioException && e.response != null && e.response!.data != null) {
+        if (e.response!.data["message"].toLowerCase() == "invalid token" ||
+            e.response!.data["message"].toLowerCase() ==
+                "invalid authorization header format") {
+          Navigator.pushNamed(
+            context,
+            Routes.unauthorized,
+          );
+        } else {
+          ToastUtil.showToast(
+              e.response!.data['code'], e.response!.data['message']);
+        }
+      }
     }
   }
 
@@ -129,7 +144,29 @@ class _HomeScreenState extends State<HomeScreen> {
         ToastUtil.showToast(response["code"], response["message"]);
       }
     } catch (e) {
-      print('Error: $e');
+      if (e is DioException &&
+          e.error is SocketException &&
+          !isConnectionTimeout) {
+        isConnectionTimeout = true;
+        Navigator.pushNamed(
+          context,
+          Routes.connection_timeout,
+        );
+        return;
+      }
+      if (e is DioException && e.response != null && e.response!.data != null) {
+        if (e.response!.data["message"].toLowerCase() == "invalid token" ||
+            e.response!.data["message"].toLowerCase() ==
+                "invalid authorization header format") {
+          Navigator.pushNamed(
+            context,
+            Routes.unauthorized,
+          );
+        } else {
+          ToastUtil.showToast(
+              e.response!.data['code'], e.response!.data['message']);
+        }
+      }
     }
   }
 
@@ -150,7 +187,29 @@ class _HomeScreenState extends State<HomeScreen> {
         ToastUtil.showToast(response["code"], response["message"]);
       }
     } catch (e) {
-      print('Error: $e');
+      if (e is DioException &&
+          e.error is SocketException &&
+          !isConnectionTimeout) {
+        isConnectionTimeout = true;
+        Navigator.pushNamed(
+          context,
+          Routes.connection_timeout,
+        );
+        return;
+      }
+      if (e is DioException && e.response != null && e.response!.data != null) {
+        if (e.response!.data["message"].toLowerCase() == "invalid token" ||
+            e.response!.data["message"].toLowerCase() ==
+                "invalid authorization header format") {
+          Navigator.pushNamed(
+            context,
+            Routes.unauthorized,
+          );
+        } else {
+          ToastUtil.showToast(
+              e.response!.data['code'], e.response!.data['message']);
+        }
+      }
     }
   }
 
@@ -175,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
       };
       final response = await orderService.createOrderData(body);
       Navigator.pop(context);
-      if (response["code"] == 200) {
+      if (response!["code"] == 200) {
         setState(() {
           carts = [];
           tableNumber.text = '';
@@ -390,7 +449,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Container(
             width: double.infinity,
-            height: 250,
+            height: 260,
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: NetworkImage(
@@ -583,7 +642,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         shrinkWrap: true,
                         itemCount: items.length,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          mainAxisExtent: 330,
+                          mainAxisExtent: 340,
                           crossAxisSpacing: 16,
                           crossAxisCount: MediaQuery.of(context).orientation ==
                                   Orientation.landscape
@@ -776,11 +835,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                         child: Text(
                           language["Order"] ?? "Order",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ),
                     ),

@@ -256,11 +256,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: Text(
                       language["Login"] ?? "Login",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
-                      ),
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
                 ),

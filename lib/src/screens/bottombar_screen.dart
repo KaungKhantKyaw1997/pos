@@ -29,11 +29,23 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
 
       var data = navItems[index];
       if (data["label"] == 'Home') {
-        Navigator.pushNamed(context, Routes.home);
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          Routes.home,
+          (route) => false,
+        );
       } else if (data["label"] == 'History') {
-        Navigator.pushNamed(context, Routes.history);
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          Routes.history,
+          (route) => false,
+        );
       } else if (data["label"] == 'Setting') {
-        Navigator.pushNamed(context, Routes.setting);
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          Routes.setting,
+          (route) => false,
+        );
       }
     }
   }
