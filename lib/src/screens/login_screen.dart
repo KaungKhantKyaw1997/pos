@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
@@ -76,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       final response = await authService.loginData(body);
       Navigator.pop(context);
-      if (response["code"] == 200) {
+      if (response!["code"] == 200) {
         prefs.setString("name", response["name"]);
         await storage.write(key: "token", value: response["token"]);
 
@@ -94,7 +95,29 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       Navigator.pop(context);
-      print('Error: $e');
+      if (e is DioException &&
+          e.error is SocketException &&
+          !isConnectionTimeout) {
+        isConnectionTimeout = true;
+        Navigator.pushNamed(
+          context,
+          Routes.connection_timeout,
+        );
+        return;
+      }
+      if (e is DioException && e.response != null && e.response!.data != null) {
+        if (e.response!.data["message"].toLowerCase() == "invalid token" ||
+            e.response!.data["message"].toLowerCase() ==
+                "invalid authorization header format") {
+          Navigator.pushNamed(
+            context,
+            Routes.unauthorized,
+          );
+        } else {
+          ToastUtil.showToast(
+              e.response!.data['code'], e.response!.data['message']);
+        }
+      }
     }
   }
 

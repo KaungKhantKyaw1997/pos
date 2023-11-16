@@ -248,7 +248,29 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       Navigator.pop(context);
-      print('Error: $e');
+      if (e is DioException &&
+          e.error is SocketException &&
+          !isConnectionTimeout) {
+        isConnectionTimeout = true;
+        Navigator.pushNamed(
+          context,
+          Routes.connection_timeout,
+        );
+        return;
+      }
+      if (e is DioException && e.response != null && e.response!.data != null) {
+        if (e.response!.data["message"].toLowerCase() == "invalid token" ||
+            e.response!.data["message"].toLowerCase() ==
+                "invalid authorization header format") {
+          Navigator.pushNamed(
+            context,
+            Routes.unauthorized,
+          );
+        } else {
+          ToastUtil.showToast(
+              e.response!.data['code'], e.response!.data['message']);
+        }
+      }
     }
   }
 
@@ -720,7 +742,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Expanded(
-                      flex: 12,
+                      flex: MediaQuery.of(context).orientation ==
+                              Orientation.landscape
+                          ? 9
+                          : 12,
                       child: ListView.builder(
                         controller: _scrollController,
                         scrollDirection: Axis.vertical,
@@ -821,6 +846,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           backgroundColor: Theme.of(context).primaryColor,
                         ),
                         onPressed: () async {
+                          if (tableId == 0) {
+                            ToastUtil.showToast(
+                                0,
+                                language["Choose Table No."] ??
+                                    "Choose Table No.");
+                            return;
+                          }
                           createOrder();
                         },
                         child: Text(

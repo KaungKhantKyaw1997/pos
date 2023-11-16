@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:pos/global.dart';
 import 'package:pos/routes.dart';
@@ -14,6 +15,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final storage = FlutterSecureStorage();
+
   @override
   void initState() {
     super.initState();
@@ -27,6 +30,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> loadLanguageData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isFirstLaunch = prefs.getBool('firstLaunch') ?? true;
+    if (isFirstLaunch) {
+      await storage.deleteAll();
+      prefs.setBool('firstLaunch', false);
+    }
+
     var lang = prefs.getString("language") ?? "eng";
     if (lang == 'eng') {
       selectedLangIndex = 0;
@@ -83,7 +92,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
                 child: SpinKitThreeBounce(
                   color: Theme.of(context).primaryColor,
-                  size: 20,
+                  size: 24,
                 ),
               ),
             ],
