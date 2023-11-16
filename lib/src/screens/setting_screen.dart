@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:package_info/package_info.dart';
 import 'package:pos/global.dart';
 import 'package:pos/routes.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
@@ -17,16 +18,24 @@ class SettingScreen extends StatefulWidget {
 class _SettingScreenState extends State<SettingScreen> {
   final authService = AuthService();
   final ScrollController _scrollController = ScrollController();
+  String version = '';
 
   @override
   void initState() {
     super.initState();
+    getData();
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  getData() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    version = packageInfo.version;
+    setState(() {});
   }
 
   showExitDialog() async {
@@ -223,6 +232,78 @@ class _SettingScreenState extends State<SettingScreen> {
                               Icons.arrow_forward_ios,
                               size: 20,
                             )
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        top: 16,
+                      ),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          language["Help & Support"] ?? "Help & Support",
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {},
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                        ),
+                        child: Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                right: 16,
+                                top: 16,
+                                bottom: 16,
+                              ),
+                              child: SvgPicture.asset(
+                                "assets/icons/version.svg",
+                                width: 24,
+                                height: 24,
+                              ),
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  right: 16,
+                                  top: 16,
+                                  bottom: 16,
+                                ),
+                                child: Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: language["App Version"] ??
+                                            "App Version",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                right: 5,
+                                top: 16,
+                                bottom: 16,
+                              ),
+                              child: Text(
+                                'v$version',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ),
                           ],
                         ),
                       ),
