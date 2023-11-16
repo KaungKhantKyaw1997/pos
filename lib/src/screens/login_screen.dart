@@ -255,7 +255,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       }
                     },
                     child: Text(
-                      language["Login"] ?? "Login",
+                      language["Log In"] ?? "Log In",
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),

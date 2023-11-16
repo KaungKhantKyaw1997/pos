@@ -212,17 +212,13 @@ class CustomDateRangePickerState extends State<CustomDateRangePicker>
                                   shape: MaterialStateProperty.all<
                                       RoundedRectangleBorder>(
                                     RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(25),
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
                                   ),
                                 ),
                                 child: Text(
                                   language["Cancel"] ?? "Cancel",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodyLarge,
                                 ),
                                 onPressed: () {
                                   try {
@@ -239,7 +235,7 @@ class CustomDateRangePickerState extends State<CustomDateRangePicker>
                                   shape: MaterialStateProperty.all<
                                       RoundedRectangleBorder>(
                                     RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(25),
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
                                   ),
                                   backgroundColor:
@@ -248,11 +244,7 @@ class CustomDateRangePickerState extends State<CustomDateRangePicker>
                                 ),
                                 child: Text(
                                   language["Ok"] ?? "Ok",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodyMedium,
                                 ),
                                 onPressed: () async {
                                   try {

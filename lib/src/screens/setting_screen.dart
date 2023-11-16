@@ -46,7 +46,7 @@ class _SettingScreenState extends State<SettingScreen> {
           ),
           title: Text(
             language["Log Out"] ?? "Log Out",
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: Theme.of(context).textTheme.titleLarge,
           ),
           contentPadding: EdgeInsets.symmetric(
             horizontal: 16,
@@ -54,7 +54,7 @@ class _SettingScreenState extends State<SettingScreen> {
           content: Text(
             language["Are you sure you want to log out?"] ??
                 "Are you sure you want to log out?",
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: Theme.of(context).textTheme.bodySmall,
           ),
           actions: [
             Padding(
@@ -66,7 +66,7 @@ class _SettingScreenState extends State<SettingScreen> {
                 style: ButtonStyle(
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                 ),
@@ -88,7 +88,7 @@ class _SettingScreenState extends State<SettingScreen> {
                 style: ButtonStyle(
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                   backgroundColor: MaterialStateProperty.all<Color>(
