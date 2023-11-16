@@ -212,7 +212,7 @@ class CustomDateRangePickerState extends State<CustomDateRangePicker>
                                   shape: MaterialStateProperty.all<
                                       RoundedRectangleBorder>(
                                     RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderRadius: BorderRadius.circular(25),
                                     ),
                                   ),
                                 ),
@@ -239,7 +239,7 @@ class CustomDateRangePickerState extends State<CustomDateRangePicker>
                                   shape: MaterialStateProperty.all<
                                       RoundedRectangleBorder>(
                                     RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderRadius: BorderRadius.circular(25),
                                     ),
                                   ),
                                   backgroundColor:

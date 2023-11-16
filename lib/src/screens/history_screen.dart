@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:custom_date_range_picker/custom_date_range_picker.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -12,6 +11,7 @@ import 'package:pos/routes.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
 import 'package:pos/src/services/orders_service.dart';
 import 'package:pos/src/utils/toast.dart';
+import 'package:pos/src/widgets/custom_date_range.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -167,20 +167,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
             style: Theme.of(context).textTheme.titleLarge,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: SvgPicture.asset(
-              "assets/icons/calendar.svg",
-              colorFilter: ColorFilter.mode(
-                Colors.black,
-                BlendMode.srcIn,
-              ),
-            ),
-            onPressed: () {
-              _selectDateRange(context);
-            },
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: SvgPicture.asset(
+        //       "assets/icons/calendar.svg",
+        //       colorFilter: ColorFilter.mode(
+        //         Colors.black,
+        //         BlendMode.srcIn,
+        //       ),
+        //     ),
+        //     onPressed: () {
+        //       _selectDateRange(context);
+        //     },
+        //   ),
+        // ],
       ),
       body: SmartRefresher(
         header: WaterDropMaterialHeader(
