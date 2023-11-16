@@ -567,7 +567,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             icon: SvgPicture.asset(
                               "assets/icons/search.svg",
                               colorFilter: ColorFilter.mode(
-                                Theme.of(context).primaryColor,
+                                Colors.black,
                                 BlendMode.srcIn,
                               ),
                             ),
@@ -711,16 +711,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: Row(
                           children: [
-                            SvgPicture.asset(
-                              "assets/icons/cart.svg",
-                              colorFilter: ColorFilter.mode(
-                                Theme.of(context).primaryColor,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 8,
-                            ),
                             Text(
                               language["Cart"] ?? "Cart",
                               style: Theme.of(context).textTheme.titleLarge,

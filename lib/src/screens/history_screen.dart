@@ -172,7 +172,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             icon: SvgPicture.asset(
               "assets/icons/calendar.svg",
               colorFilter: ColorFilter.mode(
-                Theme.of(context).primaryColor,
+                Colors.black,
                 BlendMode.srcIn,
               ),
             ),

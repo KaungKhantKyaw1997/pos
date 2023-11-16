@@ -1,8 +1,10 @@
+import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:pos/global.dart';
+import 'package:pos/routes.dart';
 import 'package:pos/src/constants/api_constants.dart';
-import 'package:pos/src/constants/font_constants.dart';
 import 'package:pos/src/services/orders_service.dart';
 import 'package:pos/src/utils/format_amount.dart';
 import 'package:pos/src/utils/toast.dart';
@@ -17,7 +19,7 @@ class HistoryDetailsScreen extends StatefulWidget {
 class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
   int id = 0;
   final orderService = OrderService();
-  final ScrollController _orderController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   Map<String, dynamic> details = {};
   List items = [];
 
@@ -37,7 +39,7 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
 
   @override
   void dispose() {
-    orderService.cancelRequest();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -45,9 +47,8 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
     try {
       final response = await orderService.getOrderDetailsData(id);
       if (response!["code"] == 200) {
-        if (response["data"] != null) {
+        if (response["data"].isNotEmpty) {
           details = response["data"];
-          print(details);
         }
         if (response["data"]["items"].isNotEmpty) {
           items = response["data"]["items"];
@@ -57,24 +58,137 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
         ToastUtil.showToast(response["code"], response["message"]);
       }
     } catch (e) {
-      print('Error: $e');
+      if (e is DioException &&
+          e.error is SocketException &&
+          !isConnectionTimeout) {
+        isConnectionTimeout = true;
+        Navigator.pushNamed(
+          context,
+          Routes.connection_timeout,
+        );
+        return;
+      }
+      if (e is DioException && e.response != null && e.response!.data != null) {
+        if (e.response!.data["message"].toLowerCase() == "invalid token" ||
+            e.response!.data["message"].toLowerCase() ==
+                "invalid authorization header format") {
+          Navigator.pushNamed(
+            context,
+            Routes.unauthorized,
+          );
+        } else {
+          ToastUtil.showToast(
+              e.response!.data['code'], e.response!.data['message']);
+        }
+      }
     }
   }
 
-  String formatNumber(int number) {
-    return 'ORD-${number.toString().padLeft(6, '0')}';
-  }
-
-  String formatDate(String date) {
-    final dateTime = DateTime.parse(date);
-    final formattedTime = DateFormat("dd/MM/yyyy").format(dateTime);
-    return formattedTime;
-  }
-
-  String formatTimestamp(String timestamp) {
-    final dateTime = DateTime.parse(timestamp);
-    final formattedTime = DateFormat("hh:mm a").format(dateTime);
-    return formattedTime;
+  itemCard(index) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 8,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        border: Border.all(color: Colors.transparent),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).primaryColor.withOpacity(0.1),
+            spreadRadius: 0.5,
+            blurRadius: 7,
+            offset: Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Container(
+              margin: EdgeInsets.only(
+                right: 8,
+              ),
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(
+                      '${ApiConstants.baseUrl}${items[index]["image_url"]}'),
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 9,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "${items[index]["item_name"]}",
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      "${language["Quantity"] ?? "Quantity"}: ",
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    Text(
+                      "${items[index]["quantity"]}",
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      "${language["Amount"] ?? "Amount"}: ",
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    Expanded(
+                      child: FormattedAmount(
+                        amount: items[index]["price"],
+                        mainTextStyle: Theme.of(context).textTheme.bodyLarge,
+                        decimalTextStyle: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      "${language["Total Amount"] ?? "Total Amount"}: ",
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    Expanded(
+                      child: FormattedAmount(
+                        amount:
+                            double.parse(items[index]["quantity"].toString()) *
+                                double.parse(items[index]["price"].toString()),
+                        mainTextStyle: Theme.of(context).textTheme.bodyLarge,
+                        decimalTextStyle: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -86,10 +200,10 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
         elevation: 0,
         title: Text(
           language["Details"] ?? "Details",
-          style: FontConstants.title1,
+          style: Theme.of(context).textTheme.titleLarge,
         ),
         iconTheme: IconThemeData(
-          color: Theme.of(context).primaryColor,
+          color: Colors.black,
         ),
       ),
       body: SingleChildScrollView(
@@ -98,244 +212,89 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
             horizontal: 16,
             vertical: 24,
           ),
-          // width: double.infinity,
           child: Column(
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white,
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          language["Date"] ?? "Date",
-                          style: FontConstants.caption1,
-                        ),
-                        Text(
-                          details["created_at"] != null
-                              ? formatDate(details["created_at"])
-                              : "",
-                          style: FontConstants.caption2,
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          language["Time"] ?? "Time",
-                          style: FontConstants.caption1,
-                        ),
-                        Text(
-                          details["created_at"] != null
-                              ? formatTimestamp(details["created_at"])
-                              : "",
-                          style: FontConstants.caption2,
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          language["Name"] ?? "Name",
-                          style: FontConstants.caption1,
-                        ),
-                        Text(
-                          details["waiter_name"].toString(),
-                          style: FontConstants.caption2,
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          language["Order No."] ?? "Order No.",
-                          style: FontConstants.caption1,
-                        ),
-                        Text(
-                          details["id"] != null
-                              ? formatNumber(details["id"])
-                              : "",
-                          style: FontConstants.caption2,
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          language["Table No."] ?? "Table No.",
-                          style: FontConstants.caption1,
-                        ),
-                        Text(
-                          details["table_number"].toString(),
-                          style: FontConstants.caption2,
-                        ),
-                      ],
-                    ),
-                  ],
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  details.isEmpty || details["created_at"].isEmpty
+                      ? ""
+                      : Jiffy.parseFromDateTime(
+                              DateTime.parse(details["created_at"] + "Z")
+                                  .toLocal())
+                          .format(pattern: "dd MMM yyyy, hh:mm a"),
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: 24,
-                  bottom: 8,
-                ),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    language["Order Information"] ?? "Order Information",
-                    style: FontConstants.smallText1,
+              SizedBox(
+                height: 4,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    '${language["Order ID"] ?? "Order ID"}: ',
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
-                ),
+                  Text(
+                    details["id"].toString(),
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ],
               ),
-              ListView.builder(
-                controller: _orderController,
-                scrollDirection: Axis.vertical,
+              SizedBox(
+                height: 2,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    '${language["Name"] ?? "Name"}: ',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  Text(
+                    details["waiter_name"].toString(),
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 4,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    '${language["Table No."] ?? "Table No."}: ',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  Text(
+                    details["table_number"].toString(),
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              GridView.builder(
+                controller: _scrollController,
                 shrinkWrap: true,
                 itemCount: items.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  mainAxisExtent: 130,
+                  crossAxisSpacing: 16,
+                  crossAxisCount: MediaQuery.of(context).orientation ==
+                          Orientation.landscape
+                      ? 3
+                      : 2,
+                  mainAxisSpacing: 16,
+                ),
                 itemBuilder: (context, index) {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.only(
-                          left: 16,
-                          right: 16,
-                          top: 8,
-                          bottom: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(index == 0 ? 10 : 0),
-                            topRight: Radius.circular(index == 0 ? 10 : 0),
-                            bottomLeft: Radius.circular(
-                                index == items.length - 1 ? 10 : 0),
-                            bottomRight: Radius.circular(
-                                index == items.length - 1 ? 10 : 0),
-                          ),
-                          color: Colors.white,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: NetworkImage(
-                                      '${ApiConstants.baseUrl}${items[index]["image_url"].toString()}'),
-                                  fit: BoxFit.cover,
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                margin: const EdgeInsets.only(
-                                  left: 4,
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${items[index]["item_name"].toString()} x ${items[index]["quantity"].toString()}',
-                                      style: FontConstants.body1,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        top: 14,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                language["Amount"] ?? "Amount",
-                                                style: FontConstants.caption1,
-                                              ),
-                                              FormattedAmount(
-                                                amount: double.parse(
-                                                    items[index]["price"]
-                                                        .toString()),
-                                                mainTextStyle:
-                                                    FontConstants.subheadline1,
-                                                decimalTextStyle:
-                                                    FontConstants.caption3,
-                                              ),
-                                            ],
-                                          ),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [
-                                              Text(
-                                                language["Total Amount"] ??
-                                                    "Total Amount",
-                                                style: FontConstants.caption1,
-                                              ),
-                                              FormattedAmount(
-                                                amount: double.parse(
-                                                        items[index]["quantity"]
-                                                            .toString()) *
-                                                    double.parse(items[index]
-                                                            ["price"]
-                                                        .toString()),
-                                                mainTextStyle:
-                                                    FontConstants.subheadline1,
-                                                decimalTextStyle:
-                                                    FontConstants.caption3,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      index < items.length - 1
-                          ? Container(
-                              padding: const EdgeInsets.only(
-                                left: 16,
-                                right: 16,
-                              ),
-                              child: const Divider(
-                                height: 0,
-                                color: Colors.grey,
-                              ),
-                            )
-                          : Container(),
-                    ],
-                  );
+                  return itemCard(index);
                 },
               ),
             ],
