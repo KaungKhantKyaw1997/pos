@@ -145,8 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
               tablesNumber.add(data["table_number"]);
             }
           }
-          tableId = tables[0]["id"];
-          tableNumber.text = tables[0]["table_number"];
         }
       } else {
         ToastUtil.showToast(response["code"], response["message"]);
@@ -159,17 +157,30 @@ class _HomeScreenState extends State<HomeScreen> {
   createOrder() async {
     showLoadingDialog(context);
     final prefs = await SharedPreferences.getInstance();
+
+    List _items = [];
+    for (var item in carts) {
+      Map<String, dynamic> cart = {
+        'item_id': item["id"],
+        'quantity': item["quantity"],
+        'special_instructions': '',
+      };
+
+      _items.add(cart);
+    }
     try {
       final body = {
         "table_id": tableId,
-        "items": carts,
+        "items": _items,
       };
       final response = await orderService.createOrderData(body);
       Navigator.pop(context);
       if (response["code"] == 200) {
         setState(() {
           carts = [];
-          items = [];
+          tableNumber.text = '';
+          tableId = 0;
+          totalAmount = 0.0;
           prefs.remove("carts");
         });
         ToastUtil.showToast(response["code"], response["message"]);
