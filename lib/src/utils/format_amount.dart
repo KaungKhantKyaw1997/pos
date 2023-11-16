@@ -3,8 +3,8 @@ import 'package:intl/intl.dart';
 
 class FormattedAmount extends StatelessWidget {
   final double amount;
-  final TextStyle mainTextStyle;
-  final TextStyle decimalTextStyle;
+  final TextStyle? mainTextStyle;
+  final TextStyle? decimalTextStyle;
 
   const FormattedAmount({
     super.key,

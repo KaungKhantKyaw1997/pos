@@ -4,8 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pos/palette.dart';
 import 'package:pos/routes.dart';
 import 'package:pos/src/providers/bottom_provider.dart';
-import 'package:pos/src/providers/cart_provider.dart';
-import 'package:pos/src/providers/table_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -13,8 +11,6 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => BottomProvider()),
-        ChangeNotifierProvider(create: (context) => CartProvider()),
-        ChangeNotifierProvider(create: (context) => TableProvider()),
       ],
       child: MyApp(),
     ),
@@ -45,27 +41,84 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'POS',
       theme: ThemeData(
-        primarySwatch: Palette.kToDark,
-        scaffoldBackgroundColor: Color(0xFFF1F3F6),
+        primaryColor: Color(0xff7468D4),
+        primaryColorLight: Color(0xffF1F0FB),
+        primaryColorDark: Color(0xff7468D4),
+        scaffoldBackgroundColor: Color(0xFFF8F8FA),
         textTheme:
             GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme).copyWith(
           displayLarge: GoogleFonts.poppins(
-            fontSize: 48,
-            fontWeight: FontWeight.w500,
+            fontSize: 38,
+            fontWeight: FontWeight.w400,
             color: Colors.black,
           ),
-          bodyMedium: GoogleFonts.poppins(
+          displayMedium: GoogleFonts.poppins(
+            fontSize: 38,
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
+          displaySmall: GoogleFonts.poppins(
+            fontSize: 38,
+            fontWeight: FontWeight.w400,
+            color: Colors.grey,
+          ),
+          headlineLarge: GoogleFonts.poppins(
+            fontSize: 32,
+            fontWeight: FontWeight.w400,
+            color: Colors.black,
+          ),
+          headlineMedium: GoogleFonts.poppins(
+            fontSize: 32,
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
+          headlineSmall: GoogleFonts.poppins(
+            fontSize: 32,
+            fontWeight: FontWeight.w400,
+            color: Colors.grey,
+          ),
+          titleLarge: GoogleFonts.poppins(
             fontSize: 24,
             fontWeight: FontWeight.w400,
             color: Colors.black,
           ),
-          bodySmall: GoogleFonts.poppins(
+          titleMedium: GoogleFonts.poppins(
             fontSize: 24,
             fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
+          titleSmall: GoogleFonts.poppins(
+            fontSize: 24,
+            fontWeight: FontWeight.w400,
+            color: Colors.grey,
+          ),
+          bodyLarge: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w400,
+            color: Colors.black,
+          ),
+          bodyMedium: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
+          bodySmall: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w400,
+            color: Colors.grey,
+          ),
+          labelLarge: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: Colors.black,
+          ),
           labelMedium: GoogleFonts.poppins(
-            fontSize: 16,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
+          labelSmall: GoogleFonts.poppins(
+            fontSize: 14,
             fontWeight: FontWeight.w400,
             color: Colors.grey,
           ),

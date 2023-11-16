@@ -1,19 +1,16 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:pos/global.dart';
 import 'package:pos/src/constants/api_constants.dart';
-import 'package:pos/src/constants/font_constants.dart';
-import 'package:pos/routes.dart';
-import 'package:pos/src/providers/cart_provider.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
 import 'package:pos/src/services/categories_service.dart';
 import 'package:pos/src/services/items_service.dart';
+import 'package:pos/src/services/orders_service.dart';
+import 'package:pos/src/services/tables_service.dart';
 import 'package:pos/src/utils/format_amount.dart';
+import 'package:pos/src/utils/loading.dart';
 import 'package:pos/src/utils/toast.dart';
-import 'package:provider/provider.dart';
+import 'package:pos/src/widgets/custom_autocomplete.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -26,15 +23,18 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final categoriesService = CategoriesService();
   final itemsService = ItemsService();
-  final ScrollController _itemController = ScrollController();
-  final PageController _categoryController = PageController(
-    viewportFraction: 0.5,
-  );
+  final tablesService = TablesService();
+  final orderService = OrderService();
+  final ScrollController _scrollController = ScrollController();
   List items = [];
   List categories = [];
-  List<Map<String, dynamic>> carts = [];
   int categoryid = 0;
-  bool addtocart = false;
+  List<Map<String, dynamic>> carts = [];
+  List tables = [];
+  List<String> tablesNumber = [];
+  TextEditingController tableNumber = TextEditingController(text: '');
+  int tableId = 0;
+  double totalAmount = 0.0;
 
   @override
   void initState() {
@@ -42,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
     getCart();
     getCategories();
     getItems();
+    getTables();
   }
 
   @override
@@ -61,15 +62,26 @@ class _HomeScreenState extends State<HomeScreen> {
           carts.add(item);
         }
       });
+      calculateTotal();
     }
   }
 
   getCategories() async {
     try {
+      categories = [
+        {
+          "id": 0,
+          "name": "All",
+        }
+      ];
+
       final response = await categoriesService.getCategoriesData();
       if (response!["code"] == 200) {
         if (response["data"].isNotEmpty) {
-          categories = response["data"];
+          categories = [
+            ...categories,
+            ...(response["data"] as List).cast<Map<String, dynamic>>()
+          ];
         }
         setState(() {});
       } else {
@@ -89,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
           items = response["data"].map((item) {
             return {
               ...item,
-              "qty": 0,
+              "quantity": 0,
               "totalamount": 0,
             };
           }).toList();
@@ -103,246 +115,194 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void showItemModal(context, index) {
-    addtocart = items[index]["qty"] != 0 ? true : false;
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
+  getTables() async {
+    try {
+      final response = await tablesService.getTablesData();
+      if (response!["code"] == 200) {
+        if (response["data"].isNotEmpty) {
+          tables = response["data"];
+
+          for (var data in response["data"]) {
+            if (data["table_number"] != null) {
+              tablesNumber.add(data["table_number"]);
+            }
+          }
+          tableId = tables[0]["id"];
+          tableNumber.text = tables[0]["table_number"];
+        }
+      } else {
+        ToastUtil.showToast(response["code"], response["message"]);
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  createOrder() async {
+    showLoadingDialog(context);
+    final prefs = await SharedPreferences.getInstance();
+    try {
+      final body = {
+        "table_id": tableId,
+        "items": items,
+      };
+      final response = await orderService.createOrderData(body);
+      Navigator.pop(context);
+      if (response["code"] == 200) {
+        setState(() {
+          carts = [];
+          items = [];
+          prefs.remove("carts");
+        });
+        ToastUtil.showToast(response["code"], response["message"]);
+      } else {
+        ToastUtil.showToast(response["code"], response["message"]);
+      }
+    } catch (e) {
+      Navigator.pop(context);
+      print('Error: $e');
+    }
+  }
+
+  cartCard(index) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(
+            16,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 110,
+                height: 110,
+                margin: const EdgeInsets.only(
+                  right: 8,
+                ),
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(
+                        '${ApiConstants.baseUrl}${carts[index]["image_url"]}'),
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(
-                      16,
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      carts[index]["name"].toString(),
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          width: 120,
-                          height: 120,
-                          margin: const EdgeInsets.only(
-                            right: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: NetworkImage(
-                                  '${ApiConstants.baseUrl}${items[index]["image_url"].toString()}'),
-                              fit: BoxFit.cover,
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    items[index]["name"].toString(),
-                                    style: FontConstants.body1,
-                                  ),
-                                  Text(
-                                    items[index]["description"].toString(),
-                                    style: FontConstants.caption1,
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  top: 30,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          language["Amount"] ?? "Amount",
-                                          style: FontConstants.caption1,
-                                        ),
-                                        FormattedAmount(
-                                          amount: double.parse(
-                                              items[index]["price"].toString()),
-                                          mainTextStyle:
-                                              FontConstants.subheadline1,
-                                          decimalTextStyle:
-                                              FontConstants.caption3,
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          language["Total Amount"] ??
-                                              "Total Amount",
-                                          style: FontConstants.caption1,
-                                        ),
-                                        FormattedAmount(
-                                          amount: double.parse(items[index]
-                                                  ["totalamount"]
-                                              .toString()),
-                                          mainTextStyle:
-                                              FontConstants.subheadline1,
-                                          decimalTextStyle:
-                                              FontConstants.caption3,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Divider(
-                    height: 0,
-                    color: Colors.grey,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      top: 16,
-                      bottom: 24,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          language["Quantity"] ?? "Quantity",
-                          style: FontConstants.caption1,
-                        ),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.remove),
+                              icon: Icon(
+                                Icons.remove,
+                                size: 24,
+                                color: Colors.black,
+                              ),
                               onPressed: () {
-                                setState(() {
-                                  if (items[index]["qty"] > 0) {
-                                    items[index]["qty"]--;
-                                    items[index]["totalamount"] = (double.parse(
-                                                items[index]["price"]
-                                                    .toString()) *
-                                            items[index]["qty"])
-                                        .toString();
-                                  }
-                                });
+                                if (carts[index]['quantity'] > 1) {
+                                  carts[index]['quantity']--;
+                                  carts[index]['totalamount'] = double.parse(
+                                          carts[index]["price"].toString()) *
+                                      carts[index]['quantity'];
+                                } else {
+                                  carts.removeAt(index);
+                                }
+                                calculateTotal();
+                                saveListToSharedPreferences(carts);
                               },
                             ),
-                            Text(
-                              items[index]["qty"].toString(),
-                              textAlign: TextAlign.center,
-                              style: FontConstants.headline1,
+                            Container(
+                              margin: EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  carts[index]['quantity'].toString(),
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.add),
+                              icon: Icon(
+                                Icons.add,
+                                size: 24,
+                                color: Colors.black,
+                              ),
                               onPressed: () {
-                                setState(() {
-                                  items[index]["qty"]++;
-                                  items[index]["totalamount"] = (double.parse(
-                                              items[index]["price"]
-                                                  .toString()) *
-                                          items[index]["qty"])
-                                      .toString();
-                                });
+                                carts[index]['quantity']++;
+                                carts[index]['totalamount'] = double.parse(
+                                        carts[index]["price"].toString()) *
+                                    carts[index]['quantity'];
+                                calculateTotal();
+                                saveListToSharedPreferences(carts);
                               },
                             ),
                           ],
                         ),
+                        FormattedAmount(
+                          amount:
+                              double.parse(carts[index]["price"].toString()),
+                          mainTextStyle: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400,
+                            color: Theme.of(context).primaryColorDark,
+                          ),
+                          decimalTextStyle: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400,
+                            color: Theme.of(context).primaryColorDark,
+                          ),
+                        ),
                       ],
                     ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      bottom: 32,
-                    ),
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        backgroundColor: Theme.of(context).primaryColor,
-                      ),
-                      onPressed: () async {
-                        if (items[index]["qty"] != 0) {
-                          Map<String, dynamic> item = {
-                            'id': items[index]["id"],
-                            'image_url': items[index]["image_url"],
-                            'name': items[index]["name"],
-                            'description': items[index]["description"],
-                            'price': items[index]["price"],
-                            'qty': items[index]["qty"],
-                            'totalamount': items[index]["totalamount"],
-                          };
-
-                          carts.add(item);
-                          saveListToSharedPreferences(carts);
-                          addtocart = true;
-
-                          CartProvider cartProvider =
-                              Provider.of<CartProvider>(context, listen: false);
-                          cartProvider.addCount(carts.length);
-
-                          Navigator.pop(context);
-                        }
-                      },
-                      child: Text(
-                        language["Add to cart"] ?? "Add to cart",
-                        style: FontConstants.button1,
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: FormattedAmount(
+                        amount: double.parse(
+                            carts[index]["totalamount"].toString()),
+                        mainTextStyle: Theme.of(context).textTheme.titleLarge,
+                        decimalTextStyle:
+                            Theme.of(context).textTheme.titleLarge,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            );
-          },
-        );
-      },
-    ).whenComplete(() {
-      if (!addtocart) {
-        items[index]["qty"] = 0;
-        items[index]["totalamount"] = 0;
-      }
-    });
+            ],
+          ),
+        ),
+        index < carts.length - 1
+            ? Container(
+                padding: const EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                ),
+                child: const Divider(
+                  height: 0,
+                  color: Colors.grey,
+                ),
+              )
+            : Container(),
+      ],
+    );
   }
 
   Future<void> saveListToSharedPreferences(
@@ -353,138 +313,368 @@ class _HomeScreenState extends State<HomeScreen> {
     final jsonData = jsonEncode(datalist);
 
     await prefs.setString(key, jsonData);
+    setState(() {});
+  }
+
+  void calculateTotal() {
+    totalAmount = 0.0;
+    for (Map<String, dynamic> cart in carts) {
+      totalAmount += cart["totalamount"];
+    }
+    setState(() {});
   }
 
   itemCard(index) {
-    return Column(
-      children: [
-        Container(
-          width: 150,
-          height: 150,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: NetworkImage(
-                  '${ApiConstants.baseUrl}${items[index]["image_url"].toString()}'),
-              fit: BoxFit.cover,
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        border: Border.all(color: Colors.transparent),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).primaryColor.withOpacity(0.1),
+            spreadRadius: 0.5,
+            blurRadius: 7,
+            offset: Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            height: 250,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(
+                    '${ApiConstants.baseUrl}${items[index]["image_url"].toString()}'),
+                fit: BoxFit.cover,
+              ),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
             ),
-            borderRadius: BorderRadius.circular(10),
           ),
-        ),
-        const SizedBox(
-          height: 8,
-        ),
-        Center(
-          child: Text(
-            items[index]["name"].toString(),
-            style: FontConstants.body1,
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+              ),
+              child: Align(
+                alignment: Alignment.bottomLeft,
+                child: Text(
+                  items[index]["name"].toString(),
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ),
+            ),
           ),
-        ),
-      ],
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    "Ks ",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      color: Theme.of(context).primaryColorDark,
+                    ),
+                  ),
+                  Expanded(
+                    child: FormattedAmount(
+                      amount: double.parse(items[index]["price"].toString()),
+                      mainTextStyle: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                        color: Theme.of(context).primaryColorDark,
+                      ),
+                      decimalTextStyle: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                        color: Theme.of(context).primaryColorDark,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        elevation: 0,
-        title: Text(
-          language["Home"] ?? "Home",
-          style: FontConstants.title1,
-        ),
-        actions: [
-          IconButton(
-            icon: SvgPicture.asset(
-              "assets/icons/search.svg",
-              width: 24,
-              height: 24,
-              colorFilter: const ColorFilter.mode(
-                Colors.black,
-                BlendMode.srcIn,
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 8,
+            child: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 24,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(
+                        bottom: 16,
+                      ),
+                      height: 50,
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: categories.length,
+                        itemBuilder: (context, index) {
+                          final isSelected =
+                              categories[index]["id"] == categoryid;
+                          return GestureDetector(
+                            onTap: () async {
+                              categoryid = categories[index]["id"];
+                              getItems();
+                            },
+                            child: Container(
+                              margin: EdgeInsets.only(
+                                right: 16,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 16,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? Theme.of(context).primaryColorLight
+                                    : Colors.white,
+                                border: Border.all(
+                                  color: isSelected
+                                      ? Theme.of(context).primaryColor
+                                      : Colors.white,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Theme.of(context)
+                                        .primaryColor
+                                        .withOpacity(0.1),
+                                    spreadRadius: 0.5,
+                                    blurRadius: 7,
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  categories[index]["name"],
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        itemExtent: null,
+                      ),
+                    ),
+                    GridView.builder(
+                      controller: _scrollController,
+                      shrinkWrap: true,
+                      itemCount: items.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        mainAxisExtent: 330,
+                        crossAxisSpacing: 16,
+                        crossAxisCount: MediaQuery.of(context).orientation ==
+                                Orientation.landscape
+                            ? 3
+                            : 2,
+                        mainAxisSpacing: 16,
+                      ),
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            for (var cart in carts) {
+                              if (cart["id"] == items[index]["id"]) {
+                                return;
+                              }
+                            }
+                            Map<String, dynamic> item = {
+                              'id': items[index]["id"],
+                              'image_url': items[index]["image_url"],
+                              'name': items[index]["name"],
+                              'description': items[index]["description"],
+                              'price': items[index]["price"],
+                              'quantity': 1,
+                              'totalamount': double.parse(
+                                      items[index]["price"].toString()) *
+                                  1,
+                            };
+
+                            carts.add(item);
+                            calculateTotal();
+                            saveListToSharedPreferences(carts);
+                          },
+                          child: itemCard(index),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
-            onPressed: () {
-              Navigator.pushNamed(context, Routes.search);
-            },
+          ),
+          Expanded(
+            flex: MediaQuery.of(context).orientation == Orientation.landscape
+                ? 4
+                : 6,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    spreadRadius: 0.5,
+                    blurRadius: 7,
+                    offset: Offset(0, 1),
+                  ),
+                ],
+              ),
+              height: double.infinity,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        top: 24,
+                        left: 16,
+                        right: 16,
+                      ),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          language["Cart"] ?? "Cart",
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 12,
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount: carts.length,
+                      itemBuilder: (context, index) {
+                        return cartCard(index);
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: 4,
+                    ),
+                    child: Divider(
+                      height: 0,
+                      thickness: 1,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      bottom: 16,
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: FormattedAmount(
+                        amount: double.parse(totalAmount.toString()),
+                        mainTextStyle: Theme.of(context).textTheme.titleLarge,
+                        decimalTextStyle:
+                            Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      bottom: 16,
+                    ),
+                    child: CustomAutocomplete(
+                      datalist: tablesNumber,
+                      textController: tableNumber,
+                      label: language["Table No."] ?? "Table No.",
+                      onSelected: (String selection) {
+                        tableNumber.text = selection;
+
+                        for (var data in tables) {
+                          if (data["table_number"] == tableNumber.text) {
+                            tableId = data["id"];
+                          }
+                        }
+                      },
+                      onChanged: (String value) {
+                        tableNumber.text = value;
+
+                        for (var data in tables) {
+                          if (data["table_number"] == tableNumber.text) {
+                            tableId = data["id"];
+                          }
+                        }
+                      },
+                      maxWidth: MediaQuery.of(context).orientation ==
+                              Orientation.landscape
+                          ? 423
+                          : 405,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      bottom: 24,
+                    ),
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        backgroundColor: Theme.of(context).primaryColor,
+                      ),
+                      onPressed: () async {
+                        createOrder();
+                      },
+                      child: Text(
+                        language["Order"] ?? "Order",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
-      ),
-      body: WillPopScope(
-        onWillPop: () => exit(0),
-        child: SingleChildScrollView(
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 24,
-            ),
-            width: double.infinity,
-            child: Column(
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(
-                    bottom: 4,
-                  ),
-                  height: 50,
-                  child: PageView.builder(
-                    scrollDirection: Axis.horizontal,
-                    controller: _categoryController,
-                    itemCount: categories.length,
-                    itemBuilder: (context, i) {
-                      final isSelected = categories[i]["id"] == categoryid;
-                      return Card(
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        color: isSelected
-                            ? Theme.of(context).primaryColorLight
-                            : Colors.white,
-                        child: GestureDetector(
-                          onTap: () {
-                            categoryid = categories[i]["id"];
-                            getItems();
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 12,
-                              horizontal: 16,
-                            ),
-                            child: Text(
-                              categories[i]["name"],
-                              style: FontConstants.caption2,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                GridView.builder(
-                  controller: _itemController,
-                  shrinkWrap: true,
-                  itemCount: items.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    mainAxisExtent: 200,
-                    childAspectRatio: 2 / 1,
-                    crossAxisSpacing: 15,
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 15,
-                  ),
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        showItemModal(context, index);
-                      },
-                      child: itemCard(index),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
       bottomNavigationBar: const BottomBarScreen(),
     );

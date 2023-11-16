@@ -7,7 +7,6 @@ import 'package:pos/global.dart';
 import 'package:pos/routes.dart';
 import 'package:pos/src/constants/color_constants.dart';
 import 'package:pos/src/providers/bottom_provider.dart';
-import 'package:pos/src/providers/cart_provider.dart';
 import 'package:pos/src/services/auth_service.dart';
 import 'package:pos/src/utils/loading.dart';
 import 'package:pos/src/utils/toast.dart';
@@ -40,14 +39,14 @@ class _LoginScreenState extends State<LoginScreen> {
     _userIDFocusNode.addListener(() {
       setState(() {
         _userIDBorderColor = _userIDFocusNode.hasFocus
-            ? ColorConstants.primaryColor
+            ? Theme.of(context).primaryColor
             : ColorConstants.borderColor;
       });
     });
     _passwordFocusNode.addListener(() {
       setState(() {
         _passwordBorderColor = _passwordFocusNode.hasFocus
-            ? ColorConstants.primaryColor
+            ? Theme.of(context).primaryColor
             : ColorConstants.borderColor;
       });
     });
@@ -70,14 +69,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
       final response = await authService.loginData(body);
       Navigator.pop(context);
-
       if (response["code"] == 200) {
         prefs.setString("name", response["name"]);
         await storage.write(key: "token", value: response["token"]);
-
-        CartProvider cartProvider =
-            Provider.of<CartProvider>(context, listen: false);
-        cartProvider.addCount(0);
 
         BottomProvider bottomProvider =
             Provider.of<BottomProvider>(context, listen: false);
@@ -146,18 +140,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     border: Border.all(
                       color: _userIDBorderColor,
                     ),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: TextFormField(
                     controller: userid,
                     focusNode: _userIDFocusNode,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: Theme.of(context).textTheme.bodyLarge,
                     cursorColor: Colors.black,
                     decoration: InputDecoration(
                       labelText: language["User Name"],
-                      labelStyle: Theme.of(context).textTheme.labelMedium,
+                      labelStyle: Theme.of(context).textTheme.labelSmall,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 14,
@@ -182,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     border: Border.all(
                       color: _passwordBorderColor,
                     ),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: TextFormField(
                     controller: password,
@@ -190,11 +184,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.done,
                     obscureText: obscurePassword,
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: Theme.of(context).textTheme.bodyLarge,
                     cursorColor: Colors.black,
                     decoration: InputDecoration(
                       labelText: language["Password"],
-                      labelStyle: Theme.of(context).textTheme.labelMedium,
+                      labelStyle: Theme.of(context).textTheme.labelSmall,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 14,
@@ -242,8 +236,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         vertical: 12,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(25),
                       ),
+                      backgroundColor: Theme.of(context).primaryColor,
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
@@ -253,7 +248,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: Text(
                       language["Login"] ?? "Login",
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
