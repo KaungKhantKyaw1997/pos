@@ -152,7 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   padding: const EdgeInsets.only(
                     left: 16,
                     right: 16,
-                    bottom: 16,
+                    bottom: 24,
                   ),
                   child: Text(
                     "Welcome to POS",
@@ -238,7 +238,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ? "assets/icons/eye-close.svg"
                               : "assets/icons/eye.svg",
                           colorFilter: ColorFilter.mode(
-                            Theme.of(context).primaryColor,
+                            Colors.black,
                             BlendMode.srcIn,
                           ),
                         ),
