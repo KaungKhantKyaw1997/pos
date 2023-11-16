@@ -42,7 +42,7 @@ class _MyAppState extends State<MyApp> {
       title: 'POS',
       theme: ThemeData(
         primaryColor: Color(0xff7468D4),
-        primaryColorLight: Color(0xffF1F0FB),
+        primaryColorLight: Color(0xffF2F4FF),
         primaryColorDark: Color(0xff7468D4),
         scaffoldBackgroundColor: Color(0xFFF8F8FA),
         textTheme:

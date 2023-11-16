@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:pos/global.dart';
 import 'package:pos/src/constants/api_constants.dart';
+import 'package:pos/src/constants/color_constants.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
 import 'package:pos/src/services/categories_service.dart';
 import 'package:pos/src/services/items_service.dart';
@@ -25,6 +27,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final itemsService = ItemsService();
   final tablesService = TablesService();
   final orderService = OrderService();
+  TextEditingController search = TextEditingController();
+  FocusNode _searchFocusNode = FocusNode();
+  Color _searchBorderColor = ColorConstants.borderColor;
   final ScrollController _scrollController = ScrollController();
   List items = [];
   List categories = [];
@@ -39,6 +44,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _searchFocusNode.addListener(() {
+      setState(() {
+        _searchBorderColor = _searchFocusNode.hasFocus
+            ? Theme.of(context).primaryColor
+            : ColorConstants.borderColor;
+      });
+    });
     getCart();
     getCategories();
     getItems();
@@ -47,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _searchFocusNode.dispose();
     itemsService.cancelRequest();
     categoriesService.cancelRequest();
     super.dispose();
@@ -92,9 +105,14 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _handleSubmitted(String value) {
+    getItems();
+  }
+
   getItems() async {
     try {
-      final response = await itemsService.getItemsData(id: categoryid);
+      final response =
+          await itemsService.getItemsData(search: search.text, id: categoryid);
       if (response!["code"] == 200) {
         items = [];
         if (response["data"].isNotEmpty) {
@@ -144,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final body = {
         "table_id": tableId,
-        "items": items,
+        "items": carts,
       };
       final response = await orderService.createOrderData(body);
       Navigator.pop(context);
@@ -260,16 +278,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         FormattedAmount(
                           amount:
                               double.parse(carts[index]["price"].toString()),
-                          mainTextStyle: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
-                            color: Theme.of(context).primaryColorDark,
-                          ),
-                          decimalTextStyle: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
-                            color: Theme.of(context).primaryColorDark,
-                          ),
+                          mainTextStyle: Theme.of(context).textTheme.bodyLarge,
+                          decimalTextStyle:
+                              Theme.of(context).textTheme.bodyLarge,
                         ),
                       ],
                     ),
@@ -380,25 +391,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Text(
                     "Ks ",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400,
-                      color: Theme.of(context).primaryColorDark,
-                    ),
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   Expanded(
                     child: FormattedAmount(
                       amount: double.parse(items[index]["price"].toString()),
-                      mainTextStyle: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                        color: Theme.of(context).primaryColorDark,
-                      ),
-                      decimalTextStyle: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                        color: Theme.of(context).primaryColorDark,
-                      ),
+                      mainTextStyle: Theme.of(context).textTheme.bodyLarge,
+                      decimalTextStyle: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
                 ],
@@ -412,271 +411,321 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 8,
-            child: SingleChildScrollView(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 24,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(
-                        bottom: 16,
-                      ),
-                      height: 50,
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: categories.length,
-                        itemBuilder: (context, index) {
-                          final isSelected =
-                              categories[index]["id"] == categoryid;
-                          return GestureDetector(
-                            onTap: () async {
-                              categoryid = categories[index]["id"];
-                              getItems();
-                            },
-                            child: Container(
-                              margin: EdgeInsets.only(
-                                right: 16,
-                              ),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        _searchFocusNode.unfocus();
+      },
+      child: Scaffold(
+        body: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 8,
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 24,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(
+                          bottom: 32,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: _searchBorderColor,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: TextFormField(
+                          controller: search,
+                          focusNode: _searchFocusNode,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.done,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                          cursorColor: Colors.black,
+                          decoration: InputDecoration(
+                            hintText: language["Search"] ?? "Search",
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
+                            border: InputBorder.none,
+                            suffixIcon: IconButton(
                               padding: const EdgeInsets.symmetric(
-                                vertical: 12,
                                 horizontal: 16,
                               ),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? Theme.of(context).primaryColorLight
-                                    : Colors.white,
-                                border: Border.all(
-                                  color: isSelected
-                                      ? Theme.of(context).primaryColor
-                                      : Colors.white,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Theme.of(context)
-                                        .primaryColor
-                                        .withOpacity(0.1),
-                                    spreadRadius: 0.5,
-                                    blurRadius: 7,
-                                    offset: Offset(0, 1),
-                                  ),
-                                ],
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  categories[index]["name"],
-                                  overflow: TextOverflow.ellipsis,
-                                  style: Theme.of(context).textTheme.bodyLarge,
+                              onPressed: () {
+                                getItems();
+                              },
+                              icon: SvgPicture.asset(
+                                "assets/icons/search.svg",
+                                colorFilter: ColorFilter.mode(
+                                  Theme.of(context).primaryColor,
+                                  BlendMode.srcIn,
                                 ),
                               ),
                             ),
+                          ),
+                          onFieldSubmitted: _handleSubmitted,
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(
+                          bottom: 16,
+                        ),
+                        height: 50,
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: categories.length,
+                          itemBuilder: (context, index) {
+                            final isSelected =
+                                categories[index]["id"] == categoryid;
+                            return GestureDetector(
+                              onTap: () async {
+                                categoryid = categories[index]["id"];
+                                getItems();
+                              },
+                              child: Container(
+                                margin: EdgeInsets.only(
+                                  right: 16,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                  horizontal: 16,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? Theme.of(context).primaryColorLight
+                                      : Colors.white,
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? Theme.of(context).primaryColor
+                                        : Colors.white,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Theme.of(context)
+                                          .primaryColor
+                                          .withOpacity(0.1),
+                                      spreadRadius: 0.5,
+                                      blurRadius: 7,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    categories[index]["name"],
+                                    overflow: TextOverflow.ellipsis,
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          itemExtent: null,
+                        ),
+                      ),
+                      GridView.builder(
+                        controller: _scrollController,
+                        shrinkWrap: true,
+                        itemCount: items.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          mainAxisExtent: 330,
+                          crossAxisSpacing: 16,
+                          crossAxisCount: MediaQuery.of(context).orientation ==
+                                  Orientation.landscape
+                              ? 3
+                              : 2,
+                          mainAxisSpacing: 16,
+                        ),
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onTap: () {
+                              for (var cart in carts) {
+                                if (cart["id"] == items[index]["id"]) {
+                                  return;
+                                }
+                              }
+                              Map<String, dynamic> item = {
+                                'id': items[index]["id"],
+                                'image_url': items[index]["image_url"],
+                                'name': items[index]["name"],
+                                'description': items[index]["description"],
+                                'price': items[index]["price"],
+                                'quantity': 1,
+                                'totalamount': double.parse(
+                                        items[index]["price"].toString()) *
+                                    1,
+                              };
+
+                              carts.add(item);
+                              calculateTotal();
+                              saveListToSharedPreferences(carts);
+                            },
+                            child: itemCard(index),
                           );
                         },
-                        itemExtent: null,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: MediaQuery.of(context).orientation == Orientation.landscape
+                  ? 4
+                  : 6,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).primaryColor.withOpacity(0.1),
+                      spreadRadius: 0.5,
+                      blurRadius: 7,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                ),
+                height: double.infinity,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          top: 24,
+                          left: 16,
+                          right: 16,
+                        ),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            language["Cart"] ?? "Cart",
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                        ),
                       ),
                     ),
-                    GridView.builder(
-                      controller: _scrollController,
-                      shrinkWrap: true,
-                      itemCount: items.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        mainAxisExtent: 330,
-                        crossAxisSpacing: 16,
-                        crossAxisCount: MediaQuery.of(context).orientation ==
-                                Orientation.landscape
-                            ? 3
-                            : 2,
-                        mainAxisSpacing: 16,
+                    Expanded(
+                      flex: 12,
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: carts.length,
+                        itemBuilder: (context, index) {
+                          return cartCard(index);
+                        },
                       ),
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () {
-                            for (var cart in carts) {
-                              if (cart["id"] == items[index]["id"]) {
-                                return;
-                              }
-                            }
-                            Map<String, dynamic> item = {
-                              'id': items[index]["id"],
-                              'image_url': items[index]["image_url"],
-                              'name': items[index]["name"],
-                              'description': items[index]["description"],
-                              'price': items[index]["price"],
-                              'quantity': 1,
-                              'totalamount': double.parse(
-                                      items[index]["price"].toString()) *
-                                  1,
-                            };
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        bottom: 4,
+                      ),
+                      child: Divider(
+                        height: 0,
+                        thickness: 1,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: 16,
+                      ),
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: FormattedAmount(
+                          amount: double.parse(totalAmount.toString()),
+                          mainTextStyle: Theme.of(context).textTheme.titleLarge,
+                          decimalTextStyle:
+                              Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: 16,
+                      ),
+                      child: CustomAutocomplete(
+                        datalist: tablesNumber,
+                        textController: tableNumber,
+                        label: language["Table No."] ?? "Table No.",
+                        onSelected: (String selection) {
+                          tableNumber.text = selection;
 
-                            carts.add(item);
-                            calculateTotal();
-                            saveListToSharedPreferences(carts);
-                          },
-                          child: itemCard(index),
-                        );
-                      },
+                          for (var data in tables) {
+                            if (data["table_number"] == tableNumber.text) {
+                              tableId = data["id"];
+                            }
+                          }
+                        },
+                        onChanged: (String value) {
+                          tableNumber.text = value;
+
+                          for (var data in tables) {
+                            if (data["table_number"] == tableNumber.text) {
+                              tableId = data["id"];
+                            }
+                          }
+                        },
+                        maxWidth: MediaQuery.of(context).orientation ==
+                                Orientation.landscape
+                            ? 423
+                            : 405,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: 24,
+                      ),
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          backgroundColor: Theme.of(context).primaryColor,
+                        ),
+                        onPressed: () async {
+                          createOrder();
+                        },
+                        child: Text(
+                          language["Order"] ?? "Order",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
-          ),
-          Expanded(
-            flex: MediaQuery.of(context).orientation == Orientation.landscape
-                ? 4
-                : 6,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Theme.of(context).primaryColor.withOpacity(0.1),
-                    spreadRadius: 0.5,
-                    blurRadius: 7,
-                    offset: Offset(0, 1),
-                  ),
-                ],
-              ),
-              height: double.infinity,
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        top: 24,
-                        left: 16,
-                        right: 16,
-                      ),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          language["Cart"] ?? "Cart",
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 12,
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: carts.length,
-                      itemBuilder: (context, index) {
-                        return cartCard(index);
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      bottom: 4,
-                    ),
-                    child: Divider(
-                      height: 0,
-                      thickness: 1,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      bottom: 16,
-                    ),
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: FormattedAmount(
-                        amount: double.parse(totalAmount.toString()),
-                        mainTextStyle: Theme.of(context).textTheme.titleLarge,
-                        decimalTextStyle:
-                            Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      bottom: 16,
-                    ),
-                    child: CustomAutocomplete(
-                      datalist: tablesNumber,
-                      textController: tableNumber,
-                      label: language["Table No."] ?? "Table No.",
-                      onSelected: (String selection) {
-                        tableNumber.text = selection;
-
-                        for (var data in tables) {
-                          if (data["table_number"] == tableNumber.text) {
-                            tableId = data["id"];
-                          }
-                        }
-                      },
-                      onChanged: (String value) {
-                        tableNumber.text = value;
-
-                        for (var data in tables) {
-                          if (data["table_number"] == tableNumber.text) {
-                            tableId = data["id"];
-                          }
-                        }
-                      },
-                      maxWidth: MediaQuery.of(context).orientation ==
-                              Orientation.landscape
-                          ? 423
-                          : 405,
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      bottom: 24,
-                    ),
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        backgroundColor: Theme.of(context).primaryColor,
-                      ),
-                      onPressed: () async {
-                        createOrder();
-                      },
-                      child: Text(
-                        language["Order"] ?? "Order",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
+        bottomNavigationBar: const BottomBarScreen(),
       ),
-      bottomNavigationBar: const BottomBarScreen(),
     );
   }
 }

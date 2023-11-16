@@ -59,6 +59,13 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  void _handleSubmitted(String value) {
+    if (value.isNotEmpty) {
+      showLoadingDialog(context);
+      login();
+    }
+  }
+
   login() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
@@ -150,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: Theme.of(context).textTheme.bodyLarge,
                     cursorColor: Colors.black,
                     decoration: InputDecoration(
-                      labelText: language["User Name"],
+                      labelText: language["User Name"] ?? "User Name",
                       labelStyle: Theme.of(context).textTheme.labelSmall,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -187,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: Theme.of(context).textTheme.bodyLarge,
                     cursorColor: Colors.black,
                     decoration: InputDecoration(
-                      labelText: language["Password"],
+                      labelText: language["Password"] ?? "Password",
                       labelStyle: Theme.of(context).textTheme.labelSmall,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -214,6 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
+                    onFieldSubmitted: _handleSubmitted,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return language["Enter Password"] ?? "Enter Password";
