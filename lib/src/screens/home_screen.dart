@@ -202,111 +202,136 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(
             16,
           ),
-          child: Row(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 110,
-                height: 110,
-                margin: const EdgeInsets.only(
-                  right: 8,
-                ),
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: NetworkImage(
-                        '${ApiConstants.baseUrl}${carts[index]["image_url"]}'),
-                    fit: BoxFit.cover,
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      carts[index]["name"].toString(),
-                      style: Theme.of(context).textTheme.bodyLarge,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 100,
+                    height: 100,
+                    margin: const EdgeInsets.only(
+                      right: 8,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: NetworkImage(
+                            '${ApiConstants.baseUrl}${carts[index]["image_url"]}'),
+                        fit: BoxFit.cover,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: Icon(
-                                Icons.remove,
-                                size: 24,
-                                color: Colors.black,
-                              ),
-                              onPressed: () {
-                                if (carts[index]['quantity'] > 1) {
-                                  carts[index]['quantity']--;
-                                  carts[index]['totalamount'] = double.parse(
-                                          carts[index]["price"].toString()) *
-                                      carts[index]['quantity'];
-                                } else {
-                                  carts.removeAt(index);
-                                }
-                                calculateTotal();
-                                saveListToSharedPreferences(carts);
-                              },
-                            ),
-                            Container(
-                              margin: EdgeInsets.symmetric(
-                                horizontal: 4,
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 8,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  carts[index]['quantity'].toString(),
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.add,
-                                size: 24,
-                                color: Colors.black,
-                              ),
-                              onPressed: () {
-                                carts[index]['quantity']++;
-                                carts[index]['totalamount'] = double.parse(
-                                        carts[index]["price"].toString()) *
-                                    carts[index]['quantity'];
-                                calculateTotal();
-                                saveListToSharedPreferences(carts);
-                              },
-                            ),
-                          ],
+                        Text(
+                          carts[index]["name"].toString(),
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodyLarge,
                         ),
-                        FormattedAmount(
-                          amount:
-                              double.parse(carts[index]["price"].toString()),
-                          mainTextStyle: Theme.of(context).textTheme.bodyLarge,
-                          decimalTextStyle:
-                              Theme.of(context).textTheme.bodyLarge,
+                        Text(
+                          carts[index]["description"].toString(),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 3,
+                          style: Theme.of(context).textTheme.labelLarge,
                         ),
                       ],
                     ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: FormattedAmount(
-                        amount: double.parse(
-                            carts[index]["totalamount"].toString()),
-                        mainTextStyle: Theme.of(context).textTheme.titleLarge,
-                        decimalTextStyle:
-                            Theme.of(context).textTheme.titleLarge,
-                      ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          "Ks",
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        SizedBox(
+                          width: 4,
+                        ),
+                        Expanded(
+                          child: FormattedAmount(
+                            amount: double.parse(
+                                carts[index]["totalamount"].toString()),
+                            mainTextStyle:
+                                Theme.of(context).textTheme.bodyLarge,
+                            decimalTextStyle:
+                                Theme.of(context).textTheme.bodyLarge,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.remove,
+                            size: 24,
+                            color: Colors.black,
+                          ),
+                          onPressed: () {
+                            if (carts[index]['quantity'] > 1) {
+                              carts[index]['quantity']--;
+                              carts[index]['totalamount'] = double.parse(
+                                      carts[index]["price"].toString()) *
+                                  carts[index]['quantity'];
+                            } else {
+                              carts.removeAt(index);
+                            }
+                            calculateTotal();
+                            saveListToSharedPreferences(carts);
+                          },
+                        ),
+                        Container(
+                          margin: EdgeInsets.symmetric(
+                            horizontal: 4,
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8,
+                          ),
+                          child: Text(
+                            carts[index]['quantity'].toString(),
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.add,
+                            size: 24,
+                            color: Colors.black,
+                          ),
+                          onPressed: () {
+                            carts[index]['quantity']++;
+                            carts[index]['totalamount'] =
+                                double.parse(carts[index]["price"].toString()) *
+                                    carts[index]['quantity'];
+                            calculateTotal();
+                            saveListToSharedPreferences(carts);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -433,120 +458,127 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Expanded(
               flex: 8,
-              child: SingleChildScrollView(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 24,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(
-                          bottom: 32,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: _searchBorderColor,
+              child: Container(
+                padding: EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  top: 24,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                        bottom: 24,
+                      ),
+                      child: TextFormField(
+                        controller: search,
+                        focusNode: _searchFocusNode,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.done,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        cursorColor: Colors.black,
+                        decoration: InputDecoration(
+                          hintText: language["Search"] ?? "Search",
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
                           ),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: TextFormField(
-                          controller: search,
-                          focusNode: _searchFocusNode,
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.done,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                          cursorColor: Colors.black,
-                          decoration: InputDecoration(
-                            hintText: language["Search"] ?? "Search",
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 14,
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25),
+                            borderSide: const BorderSide(
+                              color: ColorConstants.borderColor,
                             ),
-                            border: InputBorder.none,
-                            suffixIcon: IconButton(
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                          suffixIcon: IconButton(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                            ),
+                            onPressed: () {
+                              getItems();
+                            },
+                            icon: SvgPicture.asset(
+                              "assets/icons/search.svg",
+                              colorFilter: ColorFilter.mode(
+                                Theme.of(context).primaryColor,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
+                        ),
+                        onFieldSubmitted: _handleSubmitted,
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(
+                        bottom: 16,
+                      ),
+                      height: 50,
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: categories.length,
+                        itemBuilder: (context, index) {
+                          final isSelected =
+                              categories[index]["id"] == categoryid;
+                          return GestureDetector(
+                            onTap: () async {
+                              categoryid = categories[index]["id"];
+                              getItems();
+                            },
+                            child: Container(
+                              margin: EdgeInsets.only(
+                                right: 16,
+                              ),
                               padding: const EdgeInsets.symmetric(
+                                vertical: 12,
                                 horizontal: 16,
                               ),
-                              onPressed: () {
-                                getItems();
-                              },
-                              icon: SvgPicture.asset(
-                                "assets/icons/search.svg",
-                                colorFilter: ColorFilter.mode(
-                                  Theme.of(context).primaryColor,
-                                  BlendMode.srcIn,
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? Theme.of(context).primaryColorLight
+                                    : Colors.white,
+                                border: Border.all(
+                                  color: isSelected
+                                      ? Theme.of(context).primaryColor
+                                      : Colors.white,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Theme.of(context)
+                                        .primaryColor
+                                        .withOpacity(0.1),
+                                    spreadRadius: 0.5,
+                                    blurRadius: 7,
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  categories[index]["name"],
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.bodyLarge,
                                 ),
                               ),
                             ),
-                          ),
-                          onFieldSubmitted: _handleSubmitted,
-                        ),
+                          );
+                        },
+                        itemExtent: null,
                       ),
-                      Container(
-                        margin: EdgeInsets.only(
-                          bottom: 16,
-                        ),
-                        height: 50,
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: categories.length,
-                          itemBuilder: (context, index) {
-                            final isSelected =
-                                categories[index]["id"] == categoryid;
-                            return GestureDetector(
-                              onTap: () async {
-                                categoryid = categories[index]["id"];
-                                getItems();
-                              },
-                              child: Container(
-                                margin: EdgeInsets.only(
-                                  right: 16,
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                  horizontal: 16,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? Theme.of(context).primaryColorLight
-                                      : Colors.white,
-                                  border: Border.all(
-                                    color: isSelected
-                                        ? Theme.of(context).primaryColor
-                                        : Colors.white,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Theme.of(context)
-                                          .primaryColor
-                                          .withOpacity(0.1),
-                                      spreadRadius: 0.5,
-                                      blurRadius: 7,
-                                      offset: Offset(0, 1),
-                                    ),
-                                  ],
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    categories[index]["name"],
-                                    overflow: TextOverflow.ellipsis,
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                          itemExtent: null,
-                        ),
-                      ),
-                      GridView.builder(
+                    ),
+                    Expanded(
+                      child: GridView.builder(
                         controller: _scrollController,
                         shrinkWrap: true,
                         itemCount: items.length,
@@ -587,8 +619,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -618,12 +650,23 @@ class _HomeScreenState extends State<HomeScreen> {
                           left: 16,
                           right: 16,
                         ),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            language["Cart"] ?? "Cart",
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              "assets/icons/cart.svg",
+                              colorFilter: ColorFilter.mode(
+                                Theme.of(context).primaryColor,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text(
+                              language["Cart"] ?? "Cart",
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -654,14 +697,26 @@ class _HomeScreenState extends State<HomeScreen> {
                         right: 16,
                         bottom: 16,
                       ),
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: FormattedAmount(
-                          amount: double.parse(totalAmount.toString()),
-                          mainTextStyle: Theme.of(context).textTheme.titleLarge,
-                          decimalTextStyle:
-                              Theme.of(context).textTheme.titleLarge,
-                        ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Text(
+                            "Ks",
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          FormattedAmount(
+                            amount: double.parse(totalAmount.toString()),
+                            mainTextStyle:
+                                Theme.of(context).textTheme.titleLarge,
+                            decimalTextStyle:
+                                Theme.of(context).textTheme.titleLarge,
+                          ),
+                        ],
                       ),
                     ),
                     Padding(

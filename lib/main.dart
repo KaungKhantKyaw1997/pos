@@ -15,11 +15,6 @@ void main() {
       child: MyApp(),
     ),
   );
-
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
-  ]);
 }
 
 class MyApp extends StatefulWidget {
