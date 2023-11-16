@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pos/global.dart';
-import 'package:pos/src/constants/font_constants.dart';
 import 'package:pos/routes.dart';
 import 'package:pos/src/providers/bottom_provider.dart';
 import 'package:provider/provider.dart';
@@ -64,8 +63,8 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
           backgroundColor: Colors.white,
           selectedItemColor: Theme.of(context).primaryColorDark,
           unselectedItemColor: Colors.grey,
-          selectedFontSize: FontConstants.bottom,
-          unselectedFontSize: FontConstants.bottom,
+          selectedFontSize: 14,
+          unselectedFontSize: 14,
           selectedLabelStyle: const TextStyle(
             fontWeight: FontWeight.w400,
           ),
@@ -86,8 +85,6 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
                         : Colors.grey,
                     BlendMode.srcIn,
                   ),
-                  width: 24,
-                  height: 24,
                 ),
               ),
               label: language[navItem["label"]] ?? navItem["label"],

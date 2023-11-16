@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:pos/src/constants/font_constants.dart';
 
 class CustomDropDown extends StatelessWidget {
   final String value;
@@ -33,7 +32,7 @@ class CustomDropDown extends StatelessWidget {
         child: DropdownButton<String>(
           value: value,
           onChanged: onChanged,
-          style: FontConstants.body1,
+          style: Theme.of(context).textTheme.bodyLarge,
           borderRadius: BorderRadius.circular(8),
           icon: SvgPicture.asset(
             "assets/icons/down_arrow.svg",
@@ -49,7 +48,7 @@ class CustomDropDown extends StatelessWidget {
               value: item,
               child: Text(
                 item,
-                style: FontConstants.body1,
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
             );
           }).toList(),
