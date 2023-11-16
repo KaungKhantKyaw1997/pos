@@ -3,6 +3,7 @@ import 'package:pos/src/screens/connection_timeout_screen.dart';
 import 'package:pos/src/screens/history_details_screen.dart';
 import 'package:pos/src/screens/history_screen.dart';
 import 'package:pos/src/screens/home_screen.dart';
+import 'package:pos/src/screens/language_screen.dart';
 import 'package:pos/src/screens/login_screen.dart';
 import 'package:pos/src/screens/setting_screen.dart';
 import 'package:pos/src/screens/splash_screen.dart';
@@ -17,6 +18,7 @@ class Routes {
   static const String setting = '/setting';
   static const String connection_timeout = "/connection_timeout";
   static const String unauthorized = "/unauthorized";
+  static const String language = '/language';
 
   static final Map<String, WidgetBuilder> routes = {
     splash: (BuildContext context) => const SplashScreen(),
@@ -28,5 +30,6 @@ class Routes {
     connection_timeout: (BuildContext context) =>
         const ConnectionTimeoutScreen(),
     unauthorized: (BuildContext context) => const UnauthorizedScreen(),
+    language: (BuildContext context) => const LanguageScreen(),
   };
 }

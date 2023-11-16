@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pos/global.dart';
-import 'package:pos/src/constants/font_constants.dart';
+import 'package:pos/routes.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
 import 'package:pos/src/services/auth_service.dart';
 
@@ -16,7 +16,18 @@ class SettingScreen extends StatefulWidget {
 
 class _SettingScreenState extends State<SettingScreen> {
   final authService = AuthService();
-  final ScrollController _itemController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   showExitDialog() async {
     showDialog(
@@ -29,49 +40,68 @@ class _SettingScreenState extends State<SettingScreen> {
         ),
         child: AlertDialog(
           backgroundColor: Colors.white,
+          titlePadding: EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
           title: Text(
-            language["Logout"] ?? "Logout",
-            style: FontConstants.body1,
+            language["Log Out"] ?? "Log Out",
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 16,
           ),
           content: Text(
-            language["Are you sure you want to logout?"] ??
-                "Are you sure you want to logout?",
-            style: FontConstants.caption2,
+            language["Are you sure you want to log out?"] ??
+                "Are you sure you want to log out?",
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
           actions: [
-            TextButton(
-              style: ButtonStyle(
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+            Padding(
+              padding: EdgeInsets.only(
+                left: 8,
+                right: 4,
+              ),
+              child: TextButton(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
                   ),
                 ),
+                child: Text(
+                  language["Cancel"] ?? "Cancel",
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
               ),
-              child: Text(
-                language["Cancel"] ?? "Cancel",
-                style: FontConstants.smallText2,
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
             ),
-            TextButton(
-              style: ButtonStyle(
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+            Padding(
+              padding: EdgeInsets.only(
+                left: 4,
+                right: 8,
+              ),
+              child: TextButton(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
                   ),
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                      Theme.of(context).primaryColor),
                 ),
-                backgroundColor: MaterialStateProperty.all<Color>(
-                    Theme.of(context).primaryColor),
+                child: Text(
+                  language["Ok"] ?? "Ok",
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                onPressed: () async {
+                  authService.logout(context);
+                },
               ),
-              child: Text(
-                language["Ok"] ?? "Ok",
-                style: FontConstants.smallText3,
-              ),
-              onPressed: () async {
-                authService.logout(context);
-              },
             ),
           ],
         ),
@@ -86,13 +116,16 @@ class _SettingScreenState extends State<SettingScreen> {
         backgroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,
-        title: Text(
-          language["Setting"] ?? "Setting",
-          style: FontConstants.title1,
+        title: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            language["Settings"] ?? "Settings",
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
         ),
       ),
       body: SingleChildScrollView(
-        controller: _itemController,
+        controller: _scrollController,
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: 16,
@@ -101,33 +134,44 @@ class _SettingScreenState extends State<SettingScreen> {
           width: double.infinity,
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  bottom: 8,
-                ),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    language["General Info"] ?? "General Info",
-                    style: FontConstants.smallText1,
-                  ),
-                ),
-              ),
               Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(20),
                   color: Colors.white,
                 ),
-                padding: const EdgeInsets.only(
-                  left: 16,
-                  right: 16,
+                margin: EdgeInsets.only(
+                  bottom: 24,
                 ),
                 child: Column(
                   children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        top: 16,
+                      ),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          language["General"] ?? "General",
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
+                      ),
+                    ),
                     GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        color: Colors.transparent,
+                      onTap: () async {
+                        await Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          Routes.language,
+                          (route) => true,
+                        );
+                        setState(() {});
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                        ),
                         child: Row(
                           children: [
                             Padding(
@@ -155,22 +199,24 @@ class _SettingScreenState extends State<SettingScreen> {
                                       TextSpan(
                                         text:
                                             language["Language"] ?? "Language",
-                                        style: FontConstants.caption2,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge,
                                       )
                                     ],
                                   ),
                                 ),
                               ),
                             ),
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.only(
                                 right: 5,
                                 top: 16,
                                 bottom: 16,
                               ),
                               child: Text(
-                                "English",
-                                style: FontConstants.caption1,
+                                selectedLangIndex == 0 ? "English" : "မြန်မာ",
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ),
                             const Icon(
@@ -184,28 +230,28 @@ class _SettingScreenState extends State<SettingScreen> {
                   ],
                 ),
               ),
-              GestureDetector(
-                onTap: () async {
-                  showExitDialog();
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.white,
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 12,
-                  ),
-                  margin: const EdgeInsets.only(
-                    top: 24,
-                    bottom: 16,
-                  ),
-                  child: Center(
-                    child: Text(
-                      language["Logout"] ?? "Logout",
-                      style: FontConstants.caption2,
+              Container(
+                padding: const EdgeInsets.only(
+                  bottom: 24,
+                ),
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
                     ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    backgroundColor: Theme.of(context).primaryColor,
+                  ),
+                  onPressed: () {
+                    showExitDialog();
+                  },
+                  child: Text(
+                    language["Log Out"] ?? "Log Out",
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
               ),
