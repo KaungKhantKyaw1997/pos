@@ -192,6 +192,9 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var smallestDimension = MediaQuery.of(context).size.shortestSide;
+    final useMobileLayout = smallestDimension < 600;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -237,7 +240,7 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   Text(
-                    details["id"].toString(),
+                    '#${details["id"]}',
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ],
@@ -284,13 +287,15 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
                 shrinkWrap: true,
                 itemCount: items.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  mainAxisExtent: 170,
-                  crossAxisSpacing: 16,
-                  crossAxisCount: MediaQuery.of(context).orientation ==
-                          Orientation.landscape
-                      ? 3
-                      : 2,
-                  mainAxisSpacing: 16,
+                  mainAxisExtent: !useMobileLayout ? 170 : 120,
+                  crossAxisSpacing: !useMobileLayout ? 16 : 8,
+                  crossAxisCount: !useMobileLayout
+                      ? MediaQuery.of(context).orientation ==
+                              Orientation.landscape
+                          ? 3
+                          : 2
+                      : 1,
+                  mainAxisSpacing: !useMobileLayout ? 16 : 8,
                 ),
                 itemBuilder: (context, index) {
                   return itemCard(index);

@@ -7,6 +7,7 @@ import 'package:pos/global.dart';
 import 'package:pos/routes.dart';
 import 'package:pos/src/constants/api_constants.dart';
 import 'package:pos/src/constants/color_constants.dart';
+import 'package:pos/src/providers/cart_provider.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
 import 'package:pos/src/services/categories_service.dart';
 import 'package:pos/src/services/items_service.dart';
@@ -16,6 +17,7 @@ import 'package:pos/src/utils/format_amount.dart';
 import 'package:pos/src/utils/loading.dart';
 import 'package:pos/src/utils/toast.dart';
 import 'package:pos/src/widgets/custom_autocomplete.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -452,7 +454,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {});
   }
 
-  itemCard(index) {
+  itemCard(index, useMobileLayout) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -471,7 +473,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Container(
             width: double.infinity,
-            height: 260,
+            height: !useMobileLayout ? 260 : 160,
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: NetworkImage(
@@ -528,6 +530,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var smallestDimension = MediaQuery.of(context).size.shortestSide;
+    final useMobileLayout = smallestDimension < 600;
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
@@ -543,7 +548,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.only(
                   left: 16,
                   right: 16,
-                  top: 24,
+                  top: !useMobileLayout ? 32 : 60,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -664,13 +669,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         shrinkWrap: true,
                         itemCount: items.length,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          mainAxisExtent: 340,
-                          crossAxisSpacing: 16,
+                          mainAxisExtent: !useMobileLayout ? 340 : 220,
+                          crossAxisSpacing: !useMobileLayout ? 16 : 8,
                           crossAxisCount: MediaQuery.of(context).orientation ==
                                   Orientation.landscape
                               ? 3
                               : 2,
-                          mainAxisSpacing: 16,
+                          mainAxisSpacing: !useMobileLayout ? 16 : 8,
                         ),
                         itemBuilder: (context, index) {
                           return GestureDetector(
@@ -695,8 +700,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               carts.add(item);
                               calculateTotal();
                               saveListToSharedPreferences(carts);
+
+                              CartProvider cartProvider =
+                                  Provider.of<CartProvider>(context,
+                                      listen: false);
+                              cartProvider.addCount(carts.length);
                             },
-                            child: itemCard(index),
+                            child: itemCard(index, useMobileLayout),
                           );
                         },
                       ),
@@ -705,166 +715,168 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            Expanded(
-              flex: MediaQuery.of(context).orientation == Orientation.landscape
-                  ? 4
-                  : 6,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).primaryColor.withOpacity(0.1),
-                      spreadRadius: 0.5,
-                      blurRadius: 7,
-                      offset: Offset(0, 1),
-                    ),
-                  ],
-                ),
-                height: double.infinity,
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Padding(
+            if (!useMobileLayout)
+              Expanded(
+                flex:
+                    MediaQuery.of(context).orientation == Orientation.landscape
+                        ? 4
+                        : 6,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(context).primaryColor.withOpacity(0.1),
+                        spreadRadius: 0.5,
+                        blurRadius: 7,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  height: double.infinity,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            top: 32,
+                            left: 16,
+                            right: 16,
+                          ),
+                          child: Row(
+                            children: [
+                              Text(
+                                language["Cart"] ?? "Cart",
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: MediaQuery.of(context).orientation ==
+                                Orientation.landscape
+                            ? 9
+                            : 12,
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          itemCount: carts.length,
+                          itemBuilder: (context, index) {
+                            return cartCard(index);
+                          },
+                        ),
+                      ),
+                      Padding(
                         padding: const EdgeInsets.only(
-                          top: 24,
+                          bottom: 4,
+                        ),
+                        child: Divider(
+                          height: 0,
+                          thickness: 1,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
                           left: 16,
                           right: 16,
+                          bottom: 16,
                         ),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
                           children: [
                             Text(
-                              language["Cart"] ?? "Cart",
+                              "Ks",
                               style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            SizedBox(
+                              width: 4,
+                            ),
+                            FormattedAmount(
+                              amount: double.parse(totalAmount.toString()),
+                              mainTextStyle:
+                                  Theme.of(context).textTheme.titleLarge,
+                              decimalTextStyle:
+                                  Theme.of(context).textTheme.titleLarge,
                             ),
                           ],
                         ),
                       ),
-                    ),
-                    Expanded(
-                      flex: MediaQuery.of(context).orientation ==
-                              Orientation.landscape
-                          ? 9
-                          : 12,
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        itemCount: carts.length,
-                        itemBuilder: (context, index) {
-                          return cartCard(index);
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        bottom: 4,
-                      ),
-                      child: Divider(
-                        height: 0,
-                        thickness: 1,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 16,
-                        right: 16,
-                        bottom: 16,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Text(
-                            "Ks",
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          SizedBox(
-                            width: 4,
-                          ),
-                          FormattedAmount(
-                            amount: double.parse(totalAmount.toString()),
-                            mainTextStyle:
-                                Theme.of(context).textTheme.titleLarge,
-                            decimalTextStyle:
-                                Theme.of(context).textTheme.titleLarge,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 16,
-                        right: 16,
-                        bottom: 16,
-                      ),
-                      child: CustomAutocomplete(
-                        datalist: tablesNumber,
-                        textController: tableNumber,
-                        label: language["Table No."] ?? "Table No.",
-                        onSelected: (String selection) {
-                          tableNumber.text = selection;
-
-                          for (var data in tables) {
-                            if (data["table_number"] == tableNumber.text) {
-                              tableId = data["id"];
-                            }
-                          }
-                        },
-                        onChanged: (String value) {
-                          tableNumber.text = value;
-
-                          for (var data in tables) {
-                            if (data["table_number"] == tableNumber.text) {
-                              tableId = data["id"];
-                            }
-                          }
-                        },
-                        maxWidth: MediaQuery.of(context).orientation ==
-                                Orientation.landscape
-                            ? 423
-                            : 405,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.only(
-                        left: 16,
-                        right: 16,
-                        bottom: 24,
-                      ),
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 12,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          backgroundColor: Theme.of(context).primaryColor,
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                          bottom: 16,
                         ),
-                        onPressed: () async {
-                          if (tableId == 0) {
-                            ToastUtil.showToast(
-                                0,
-                                language["Choose Table No."] ??
-                                    "Choose Table No.");
-                            return;
-                          }
-                          createOrder();
-                        },
-                        child: Text(
-                          language["Order"] ?? "Order",
-                          style: Theme.of(context).textTheme.bodyMedium,
+                        child: CustomAutocomplete(
+                          datalist: tablesNumber,
+                          textController: tableNumber,
+                          label: language["Table No."] ?? "Table No.",
+                          onSelected: (String selection) {
+                            tableNumber.text = selection;
+
+                            for (var data in tables) {
+                              if (data["table_number"] == tableNumber.text) {
+                                tableId = data["id"];
+                              }
+                            }
+                          },
+                          onChanged: (String value) {
+                            tableNumber.text = value;
+
+                            for (var data in tables) {
+                              if (data["table_number"] == tableNumber.text) {
+                                tableId = data["id"];
+                              }
+                            }
+                          },
+                          maxWidth: MediaQuery.of(context).orientation ==
+                                  Orientation.landscape
+                              ? 423
+                              : 405,
                         ),
                       ),
-                    ),
-                  ],
+                      Container(
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                          bottom: 24,
+                        ),
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            backgroundColor: Theme.of(context).primaryColor,
+                          ),
+                          onPressed: () async {
+                            if (tableId == 0) {
+                              ToastUtil.showToast(
+                                  0,
+                                  language["Choose Table No."] ??
+                                      "Choose Table No.");
+                              return;
+                            }
+                            createOrder();
+                          },
+                          child: Text(
+                            language["Order"] ?? "Order",
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
           ],
         ),
         bottomNavigationBar: const BottomBarScreen(),

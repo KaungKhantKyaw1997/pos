@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos/routes.dart';
 import 'package:pos/src/providers/bottom_provider.dart';
+import 'package:pos/src/providers/cart_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -9,6 +11,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => BottomProvider()),
+        ChangeNotifierProvider(create: (context) => CartProvider()),
       ],
       child: MyApp(),
     ),
@@ -30,6 +33,16 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    var smallestDimension = MediaQuery.of(context).size.shortestSide;
+    final useMobileLayout = smallestDimension < 600;
+
+    if (useMobileLayout) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    }
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'POS',
@@ -41,77 +54,77 @@ class _MyAppState extends State<MyApp> {
         textTheme:
             GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme).copyWith(
           displayLarge: GoogleFonts.poppins(
-            fontSize: 38,
+            fontSize: !useMobileLayout ? 30 : 28,
             fontWeight: FontWeight.w400,
             color: Colors.black,
           ),
           displayMedium: GoogleFonts.poppins(
-            fontSize: 38,
+            fontSize: !useMobileLayout ? 30 : 28,
             fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
           displaySmall: GoogleFonts.poppins(
-            fontSize: 38,
+            fontSize: !useMobileLayout ? 30 : 28,
             fontWeight: FontWeight.w400,
             color: Colors.grey,
           ),
           headlineLarge: GoogleFonts.poppins(
-            fontSize: 32,
+            fontSize: !useMobileLayout ? 26 : 24,
             fontWeight: FontWeight.w400,
             color: Colors.black,
           ),
           headlineMedium: GoogleFonts.poppins(
-            fontSize: 32,
+            fontSize: !useMobileLayout ? 26 : 24,
             fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
           headlineSmall: GoogleFonts.poppins(
-            fontSize: 32,
+            fontSize: !useMobileLayout ? 26 : 24,
             fontWeight: FontWeight.w400,
             color: Colors.grey,
           ),
           titleLarge: GoogleFonts.poppins(
-            fontSize: 24,
+            fontSize: !useMobileLayout ? 22 : 20,
             fontWeight: FontWeight.w400,
             color: Colors.black,
           ),
           titleMedium: GoogleFonts.poppins(
-            fontSize: 24,
+            fontSize: !useMobileLayout ? 22 : 20,
             fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
           titleSmall: GoogleFonts.poppins(
-            fontSize: 24,
+            fontSize: !useMobileLayout ? 22 : 20,
             fontWeight: FontWeight.w400,
             color: Colors.grey,
           ),
           bodyLarge: GoogleFonts.poppins(
-            fontSize: 18,
+            fontSize: !useMobileLayout ? 18 : 16,
             fontWeight: FontWeight.w400,
             color: Colors.black,
           ),
           bodyMedium: GoogleFonts.poppins(
-            fontSize: 18,
+            fontSize: !useMobileLayout ? 18 : 16,
             fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
           bodySmall: GoogleFonts.poppins(
-            fontSize: 18,
+            fontSize: !useMobileLayout ? 18 : 16,
             fontWeight: FontWeight.w400,
             color: Colors.grey,
           ),
           labelLarge: GoogleFonts.poppins(
-            fontSize: 14,
+            fontSize: !useMobileLayout ? 14 : 12,
             fontWeight: FontWeight.w400,
             color: Colors.black,
           ),
           labelMedium: GoogleFonts.poppins(
-            fontSize: 14,
+            fontSize: !useMobileLayout ? 14 : 12,
             fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
           labelSmall: GoogleFonts.poppins(
-            fontSize: 14,
+            fontSize: !useMobileLayout ? 14 : 12,
             fontWeight: FontWeight.w400,
             color: Colors.grey,
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pos/src/screens/cart_screen.dart';
 import 'package:pos/src/screens/connection_timeout_screen.dart';
 import 'package:pos/src/screens/history_details_screen.dart';
 import 'package:pos/src/screens/history_screen.dart';
@@ -19,6 +20,7 @@ class Routes {
   static const String connection_timeout = "/connection_timeout";
   static const String unauthorized = "/unauthorized";
   static const String language = '/language';
+  static const String cart = '/cart';
 
   static final Map<String, WidgetBuilder> routes = {
     splash: (BuildContext context) => const SplashScreen(),
@@ -31,5 +33,6 @@ class Routes {
         const ConnectionTimeoutScreen(),
     unauthorized: (BuildContext context) => const UnauthorizedScreen(),
     language: (BuildContext context) => const LanguageScreen(),
+    cart: (BuildContext context) => const CartScreen(),
   };
 }
