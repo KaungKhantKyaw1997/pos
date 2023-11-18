@@ -54,77 +54,77 @@ class _MyAppState extends State<MyApp> {
         textTheme:
             GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme).copyWith(
           displayLarge: GoogleFonts.poppins(
-            fontSize: !useMobileLayout ? 30 : 28,
+            fontSize: !useMobileLayout ? 30 : 26,
             fontWeight: FontWeight.w400,
             color: Colors.black,
           ),
           displayMedium: GoogleFonts.poppins(
-            fontSize: !useMobileLayout ? 30 : 28,
+            fontSize: !useMobileLayout ? 30 : 26,
             fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
           displaySmall: GoogleFonts.poppins(
-            fontSize: !useMobileLayout ? 30 : 28,
+            fontSize: !useMobileLayout ? 30 : 26,
             fontWeight: FontWeight.w400,
             color: Colors.grey,
           ),
           headlineLarge: GoogleFonts.poppins(
-            fontSize: !useMobileLayout ? 26 : 24,
+            fontSize: !useMobileLayout ? 26 : 22,
             fontWeight: FontWeight.w400,
             color: Colors.black,
           ),
           headlineMedium: GoogleFonts.poppins(
-            fontSize: !useMobileLayout ? 26 : 24,
+            fontSize: !useMobileLayout ? 26 : 22,
             fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
           headlineSmall: GoogleFonts.poppins(
-            fontSize: !useMobileLayout ? 26 : 24,
+            fontSize: !useMobileLayout ? 26 : 22,
             fontWeight: FontWeight.w400,
             color: Colors.grey,
           ),
           titleLarge: GoogleFonts.poppins(
-            fontSize: !useMobileLayout ? 22 : 20,
+            fontSize: !useMobileLayout ? 22 : 18,
             fontWeight: FontWeight.w400,
             color: Colors.black,
           ),
           titleMedium: GoogleFonts.poppins(
-            fontSize: !useMobileLayout ? 22 : 20,
+            fontSize: !useMobileLayout ? 22 : 18,
             fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
           titleSmall: GoogleFonts.poppins(
-            fontSize: !useMobileLayout ? 22 : 20,
+            fontSize: !useMobileLayout ? 22 : 18,
             fontWeight: FontWeight.w400,
             color: Colors.grey,
           ),
           bodyLarge: GoogleFonts.poppins(
-            fontSize: !useMobileLayout ? 18 : 16,
+            fontSize: !useMobileLayout ? 18 : 14,
             fontWeight: FontWeight.w400,
             color: Colors.black,
           ),
           bodyMedium: GoogleFonts.poppins(
-            fontSize: !useMobileLayout ? 18 : 16,
+            fontSize: !useMobileLayout ? 18 : 14,
             fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
           bodySmall: GoogleFonts.poppins(
-            fontSize: !useMobileLayout ? 18 : 16,
+            fontSize: !useMobileLayout ? 18 : 14,
             fontWeight: FontWeight.w400,
             color: Colors.grey,
           ),
           labelLarge: GoogleFonts.poppins(
-            fontSize: !useMobileLayout ? 14 : 12,
+            fontSize: !useMobileLayout ? 14 : 10,
             fontWeight: FontWeight.w400,
             color: Colors.black,
           ),
           labelMedium: GoogleFonts.poppins(
-            fontSize: !useMobileLayout ? 14 : 12,
+            fontSize: !useMobileLayout ? 14 : 10,
             fontWeight: FontWeight.w400,
             color: Colors.white,
           ),
           labelSmall: GoogleFonts.poppins(
-            fontSize: !useMobileLayout ? 14 : 12,
+            fontSize: !useMobileLayout ? 14 : 10,
             fontWeight: FontWeight.w400,
             color: Colors.grey,
           ),

@@ -255,7 +255,7 @@ class _CartScreenState extends State<CartScreen> {
                       children: [
                         Text(
                           "Ks",
-                          style: Theme.of(context).textTheme.labelLarge,
+                          style: Theme.of(context).textTheme.bodyLarge,
                         ),
                         SizedBox(
                           width: 4,
@@ -263,9 +263,9 @@ class _CartScreenState extends State<CartScreen> {
                         FormattedAmount(
                           amount: double.parse(
                               carts[index]["totalamount"].toString()),
-                          mainTextStyle: Theme.of(context).textTheme.labelLarge,
+                          mainTextStyle: Theme.of(context).textTheme.bodyLarge,
                           decimalTextStyle:
-                              Theme.of(context).textTheme.labelLarge,
+                              Theme.of(context).textTheme.bodyLarge,
                         ),
                       ],
                     ),
@@ -451,15 +451,16 @@ class _CartScreenState extends State<CartScreen> {
                     children: [
                       Text(
                         "Ks",
-                        style: Theme.of(context).textTheme.bodyLarge,
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
                       SizedBox(
                         width: 4,
                       ),
                       FormattedAmount(
                         amount: double.parse(totalAmount.toString()),
-                        mainTextStyle: Theme.of(context).textTheme.bodyLarge,
-                        decimalTextStyle: Theme.of(context).textTheme.bodyLarge,
+                        mainTextStyle: Theme.of(context).textTheme.titleLarge,
+                        decimalTextStyle:
+                            Theme.of(context).textTheme.titleLarge,
                       ),
                     ],
                   ),
