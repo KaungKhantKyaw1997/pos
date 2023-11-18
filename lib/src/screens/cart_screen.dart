@@ -368,9 +368,11 @@ class _CartScreenState extends State<CartScreen> {
           Expanded(
             child: SingleChildScrollView(
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 24,
+                padding: const EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  top: 24,
+                  bottom: 16,
                 ),
                 width: double.infinity,
                 child: Container(
