@@ -30,7 +30,6 @@ class _CartScreenState extends State<CartScreen> {
   final orderService = OrderService();
   final ScrollController _cartController = ScrollController();
   List<Map<String, dynamic>> carts = [];
-  List items = [];
   List tables = [];
   List<String> tablesNumber = [];
   TextEditingController tableNumber = TextEditingController(text: '');
@@ -56,14 +55,7 @@ class _CartScreenState extends State<CartScreen> {
       setState(() {
         List jsonData = jsonDecode(cartsJson) ?? [];
         for (var item in jsonData) {
-          Map<String, dynamic> cart = {
-            'item_id': item["id"],
-            'quantity': item["quantity"],
-            'special_instructions': '',
-          };
-
           carts.add(item);
-          items.add(cart);
         }
       });
       calculateTotal();
@@ -116,10 +108,21 @@ class _CartScreenState extends State<CartScreen> {
   createOrder() async {
     showLoadingDialog(context);
     final prefs = await SharedPreferences.getInstance();
+
+    List _items = [];
+    for (var item in carts) {
+      Map<String, dynamic> cart = {
+        'item_id': item["id"],
+        'quantity': item["quantity"],
+        'special_instructions': '',
+      };
+
+      _items.add(cart);
+    }
     try {
       final body = {
         "table_id": tableId,
-        "items": items,
+        "items": _items,
       };
       final response = await orderService.createOrderData(body);
       Navigator.pop(context);
@@ -284,6 +287,10 @@ class _CartScreenState extends State<CartScreen> {
                                 double.parse(carts[index]["price"].toString()) *
                                     carts[index]['quantity'];
                           } else {
+                            CartProvider cartProvider =
+                                Provider.of<CartProvider>(context,
+                                    listen: false);
+                            cartProvider.addCount(cartProvider.count - 1);
                             carts.removeAt(index);
                           }
                           calculateTotal();
@@ -390,16 +397,8 @@ class _CartScreenState extends State<CartScreen> {
                                 cartProvider.addCount(cartProvider.count - 1);
 
                                 carts.removeAt(index);
+                                calculateTotal();
                                 saveListToSharedPreferences(carts);
-                                for (var item in carts) {
-                                  Map<String, dynamic> cart = {
-                                    'item_id': item["id"],
-                                    'quantity': item["quantity"],
-                                    'special_instructions': '',
-                                  };
-
-                                  items.add(cart);
-                                }
                               },
                               backgroundColor: const Color(0xFFE3200F),
                               foregroundColor: Colors.white,
