@@ -5,8 +5,10 @@ import 'package:jiffy/jiffy.dart';
 import 'package:pos/global.dart';
 import 'package:pos/routes.dart';
 import 'package:pos/src/constants/api_constants.dart';
+import 'package:pos/src/constants/color_constants.dart';
 import 'package:pos/src/services/order_service.dart';
 import 'package:pos/src/utils/format_amount.dart';
+import 'package:pos/src/utils/loading.dart';
 import 'package:pos/src/utils/toast.dart';
 
 class HistoryDetailsScreen extends StatefulWidget {
@@ -71,6 +73,52 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
       if (e is DioException && e.response != null && e.response!.data != null) {
         if (e.response!.data["message"].toLowerCase() == "invalid token" ||
             e.response!.data["message"].toLowerCase() ==
+                "invalid authorization header format") {
+          Navigator.pushNamed(
+            context,
+            Routes.unauthorized,
+          );
+        } else {
+          ToastUtil.showToast(
+              e.response!.data['code'], e.response!.data['message']);
+        }
+      }
+    }
+  }
+
+  updateOrder(status) async {
+    showLoadingDialog(context);
+    try {
+      final body = {
+        "status": status,
+      };
+
+      final response = await orderService.updateOrderData(details["id"], body);
+      Navigator.pop(context);
+      if (response!["code"] == 200) {
+        setState(() {
+          details["status"] = status;
+        });
+        Navigator.pop(context);
+        ToastUtil.showToast(response["code"], response["message"]);
+      } else {
+        ToastUtil.showToast(response["code"], response["message"]);
+      }
+    } catch (e, s) {
+      Navigator.pop(context);
+      if (e is DioException &&
+          e.error is SocketException &&
+          !isConnectionTimeout) {
+        isConnectionTimeout = true;
+        Navigator.pushNamed(
+          context,
+          Routes.connection_timeout,
+        );
+        return;
+      }
+      if (e is DioException && e.response != null && e.response!.data != null) {
+        if (e.response!.data["message"] == "invalid token" ||
+            e.response!.data["message"] ==
                 "invalid authorization header format") {
           Navigator.pushNamed(
             context,
@@ -302,6 +350,33 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
                 },
               ),
             ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.only(
+          left: 16,
+          right: 16,
+          bottom: 24,
+        ),
+        width: double.infinity,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 12,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25),
+            ),
+            backgroundColor: ColorConstants.redColor,
+          ),
+          onPressed: () async {
+            updateOrder("Canceled");
+          },
+          child: Text(
+            language["Order Cancel"] ?? "Order Cancel",
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
         ),
       ),
