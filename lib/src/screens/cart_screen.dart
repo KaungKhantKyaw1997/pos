@@ -9,8 +9,8 @@ import 'package:pos/routes.dart';
 import 'package:pos/src/constants/api_constants.dart';
 import 'package:pos/src/providers/cart_provider.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
-import 'package:pos/src/services/orders_service.dart';
-import 'package:pos/src/services/tables_service.dart';
+import 'package:pos/src/services/order_service.dart';
+import 'package:pos/src/services/table_service.dart';
 import 'package:pos/src/utils/format_amount.dart';
 import 'package:pos/src/utils/loading.dart';
 import 'package:pos/src/utils/toast.dart';
@@ -26,7 +26,7 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  final tablesService = TablesService();
+  final tableService = TableService();
   final orderService = OrderService();
   final ScrollController _cartController = ScrollController();
   List<Map<String, dynamic>> carts = [];
@@ -64,7 +64,7 @@ class _CartScreenState extends State<CartScreen> {
 
   getTables() async {
     try {
-      final response = await tablesService.getTablesData();
+      final response = await tableService.getTablesData();
       if (response!["code"] == 200) {
         if (response["data"].isNotEmpty) {
           tables = response["data"];

@@ -5,7 +5,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:pos/global.dart';
 import 'package:pos/routes.dart';
 import 'package:pos/src/constants/api_constants.dart';
-import 'package:pos/src/services/orders_service.dart';
+import 'package:pos/src/services/order_service.dart';
 import 'package:pos/src/utils/format_amount.dart';
 import 'package:pos/src/utils/toast.dart';
 

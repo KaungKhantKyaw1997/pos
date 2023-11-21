@@ -9,7 +9,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:pos/global.dart';
 import 'package:pos/routes.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
-import 'package:pos/src/services/orders_service.dart';
+import 'package:pos/src/services/order_service.dart';
 import 'package:pos/src/utils/toast.dart';
 import 'package:pos/src/widgets/custom_date_range.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';

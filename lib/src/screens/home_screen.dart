@@ -9,10 +9,10 @@ import 'package:pos/src/constants/api_constants.dart';
 import 'package:pos/src/constants/color_constants.dart';
 import 'package:pos/src/providers/cart_provider.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
-import 'package:pos/src/services/categories_service.dart';
-import 'package:pos/src/services/items_service.dart';
-import 'package:pos/src/services/orders_service.dart';
-import 'package:pos/src/services/tables_service.dart';
+import 'package:pos/src/services/category_service.dart';
+import 'package:pos/src/services/item_service.dart';
+import 'package:pos/src/services/order_service.dart';
+import 'package:pos/src/services/table_service.dart';
 import 'package:pos/src/utils/format_amount.dart';
 import 'package:pos/src/utils/loading.dart';
 import 'package:pos/src/utils/toast.dart';
@@ -28,9 +28,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final categoriesService = CategoriesService();
-  final itemsService = ItemsService();
-  final tablesService = TablesService();
+  final categoryService = CategoryService();
+  final itemService = ItemService();
+  final tableService = TableService();
   final orderService = OrderService();
   TextEditingController search = TextEditingController();
   FocusNode _searchFocusNode = FocusNode();
@@ -83,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       ];
 
-      final response = await categoriesService.getCategoriesData();
+      final response = await categoryService.getCategoriesData();
       if (response!["code"] == 200) {
         if (response["data"].isNotEmpty) {
           categories = [
@@ -129,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
   getItems() async {
     try {
       final response =
-          await itemsService.getItemsData(search: search.text, id: categoryid);
+          await itemService.getItemsData(search: search.text, id: categoryid);
       if (response!["code"] == 200) {
         items = [];
         if (response["data"].isNotEmpty) {
@@ -174,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   getTables() async {
     try {
-      final response = await tablesService.getTablesData();
+      final response = await tableService.getTablesData();
       if (response!["code"] == 200) {
         if (response["data"].isNotEmpty) {
           tables = response["data"];

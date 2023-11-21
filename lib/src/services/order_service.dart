@@ -28,6 +28,23 @@ class OrderService {
     return response.data;
   }
 
+  Future<Map<String, dynamic>?> updateOrderData(
+      int id, Map<String, dynamic> body) async {
+    var token = await storage.read(key: "token") ?? '';
+    final response = await dio.put(
+      '${ApiConstants.ordersUrl}/$id',
+      options: Options(
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          if (token.isNotEmpty) 'Authorization': 'Bearer $token',
+        },
+      ),
+      data: jsonEncode(body),
+    );
+
+    return response.data;
+  }
+
   Future<Map<String, dynamic>?> getOrdersData({
     int page = 1,
     int perPage = 10,
