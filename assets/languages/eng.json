@@ -21,18 +21,15 @@
     "Amount": "Amount",
     "Total Amount": "Total Amount",
     "Quantity": "Quantity",
-    "Add to cart": "Add to cart",
     "Order": "Order",
     "Cancel": "Cancel",
     "Ok": "Ok",
     "Are you sure you want to log out?": "Are you sure you want to log out?",
     "Name": "Name",
     "Table No.": "Table No.",
-    "Order No.": "Order No.",
-    "Date": "Date",
-    "Time": "Time",
     "Order ID": "Order ID",
     "From": "From",
     "To": "To",
-    "Choose Table No.": "Choose Table No."
+    "Choose Table No.": "Choose Table No.",
+    "Cancel Order": "Cancel Order"
 }

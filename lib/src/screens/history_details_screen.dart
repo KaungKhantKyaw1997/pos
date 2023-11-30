@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:pos/global.dart';
 import 'package:pos/routes.dart';
@@ -264,68 +265,111 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
           ),
           child: Column(
             children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  details.isEmpty || details["created_at"].isEmpty
-                      ? ""
-                      : Jiffy.parseFromDateTime(
-                              DateTime.parse(details["created_at"] + "Z")
-                                  .toLocal())
-                          .format(pattern: "dd MMM yyyy, hh:mm a"),
-                  style: Theme.of(context).textTheme.bodyLarge,
+              Container(
+                padding: const EdgeInsets.all(
+                  16,
                 ),
-              ),
-              SizedBox(
-                height: 4,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text(
-                    '${language["Order ID"] ?? "Order ID"}: ',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  Text(
-                    '#${details["id"]}',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 2,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text(
-                    '${language["Name"] ?? "Name"}: ',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  Text(
-                    details["waiter_name"].toString(),
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 4,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text(
-                    '${language["Table No."] ?? "Table No."}: ',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  Text(
-                    details["table_number"].toString(),
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ],
+                margin: const EdgeInsets.only(
+                  bottom: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          '${language["Order ID"] ?? "Order ID"}: ',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        Text(
+                          '#${details["id"]}',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    Row(
+                      children: [
+                        SvgPicture.asset(
+                          "assets/icons/person.svg",
+                          width: 20,
+                          height: 20,
+                          colorFilter: ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text(
+                          details["waiter_name"].toString(),
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    Row(
+                      children: [
+                        SvgPicture.asset(
+                          "assets/icons/table.svg",
+                          width: 20,
+                          height: 20,
+                          colorFilter: ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text(
+                          '${language["Table No."] ?? "Table No."} ' +
+                              details["table_number"].toString(),
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    Row(
+                      children: [
+                        SvgPicture.asset(
+                          "assets/icons/calendar.svg",
+                          width: 20,
+                          height: 20,
+                          colorFilter: ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text(
+                          details.isEmpty || details["created_at"].isEmpty
+                              ? ""
+                              : Jiffy.parseFromDateTime(DateTime.parse(
+                                          details["created_at"] + "Z")
+                                      .toLocal())
+                                  .format(pattern: "dd MMM yyyy, hh:mm a"),
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
               SizedBox(
                 height: 16,
@@ -375,7 +419,7 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
             updateOrder("Canceled");
           },
           child: Text(
-            language["Order Cancel"] ?? "Order Cancel",
+            language["Cancel Order"] ?? "Cancel Order",
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ),

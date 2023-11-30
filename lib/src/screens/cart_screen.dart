@@ -7,6 +7,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:pos/global.dart';
 import 'package:pos/routes.dart';
 import 'package:pos/src/constants/api_constants.dart';
+import 'package:pos/src/constants/color_constants.dart';
 import 'package:pos/src/providers/cart_provider.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
 import 'package:pos/src/services/order_service.dart';
@@ -341,6 +342,7 @@ class _CartScreenState extends State<CartScreen> {
                 child: const Divider(
                   height: 0,
                   color: Colors.grey,
+                  thickness: 0.2,
                 ),
               )
             : Container(),
@@ -355,12 +357,12 @@ class _CartScreenState extends State<CartScreen> {
         backgroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,
-        title: Text(
-          language["Cart"] ?? "Cart",
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        iconTheme: IconThemeData(
-          color: Colors.black,
+        title: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            language["Cart"] ?? "Cart",
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
         ),
       ),
       body: Column(
@@ -377,7 +379,7 @@ class _CartScreenState extends State<CartScreen> {
                 width: double.infinity,
                 child: Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(20),
                     color: Colors.white,
                   ),
                   child: ListView.builder(
@@ -402,12 +404,12 @@ class _CartScreenState extends State<CartScreen> {
                                 calculateTotal();
                                 saveListToSharedPreferences(carts);
                               },
-                              backgroundColor: const Color(0xFFE3200F),
+                              backgroundColor: ColorConstants.redColor,
                               foregroundColor: Colors.white,
                               borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(index == 0 ? 10 : 0),
+                                topRight: Radius.circular(index == 0 ? 20 : 0),
                                 bottomRight: Radius.circular(
-                                    index == carts.length - 1 ? 10 : 0),
+                                    index == carts.length - 1 ? 20 : 0),
                               ),
                               icon: Icons.delete,
                               label: 'Delete',
@@ -426,7 +428,7 @@ class _CartScreenState extends State<CartScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(
-                10,
+                20,
               ),
             ),
             padding: const EdgeInsets.all(
@@ -442,8 +444,6 @@ class _CartScreenState extends State<CartScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(
-                    left: 16,
-                    right: 16,
                     bottom: 16,
                   ),
                   child: Row(

@@ -96,6 +96,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                 child: Divider(
                   height: 0,
                   color: Colors.grey,
+                  thickness: 0.2,
                 ),
               ),
               ListTile(

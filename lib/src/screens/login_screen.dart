@@ -24,12 +24,11 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final authService = AuthService();
   final storage = FlutterSecureStorage();
-  final _formKey = GlobalKey<FormState>();
-  TextEditingController userid = TextEditingController(text: 'waiter001');
+  TextEditingController userid = TextEditingController(text: '');
   FocusNode _userIDFocusNode = FocusNode();
   Color _userIDBorderColor = ColorConstants.borderColor;
 
-  TextEditingController password = TextEditingController(text: 'User@123');
+  TextEditingController password = TextEditingController(text: '');
   FocusNode _passwordFocusNode = FocusNode();
   Color _passwordBorderColor = ColorConstants.borderColor;
   bool obscurePassword = true;
@@ -129,162 +128,155 @@ class _LoginScreenState extends State<LoginScreen> {
         _userIDFocusNode.unfocus();
         _passwordFocusNode.unfocus();
       },
-      child: WillPopScope(
-        onWillPop: () => exit(0),
+      child: PopScope(
+        canPop: false,
         child: Scaffold(
           backgroundColor: Colors.white,
-          body: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 400,
-                  height: 400,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/login.png'),
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 400,
+                height: 400,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/login.png'),
+                  ),
+                  shape: BoxShape.circle,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  bottom: 24,
+                ),
+                child: Text(
+                  "Welcome to POS",
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.displayLarge,
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  bottom: 16,
+                ),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: _userIDBorderColor,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextFormField(
+                  controller: userid,
+                  focusNode: _userIDFocusNode,
+                  keyboardType: TextInputType.text,
+                  textInputAction: TextInputAction.next,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                  cursorColor: Colors.black,
+                  decoration: InputDecoration(
+                    labelText: language["User Name"] ?? "User Name",
+                    labelStyle: Theme.of(context).textTheme.labelSmall,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
                     ),
-                    shape: BoxShape.circle,
+                    border: InputBorder.none,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 16,
-                    right: 16,
-                    bottom: 24,
-                  ),
-                  child: Text(
-                    "Welcome to POS",
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.displayLarge,
-                  ),
+              ),
+              Container(
+                margin: EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  bottom: 32,
                 ),
-                Container(
-                  margin: EdgeInsets.only(
-                    left: 16,
-                    right: 16,
-                    bottom: 16,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: _passwordBorderColor,
                   ),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: _userIDBorderColor,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: TextFormField(
-                    controller: userid,
-                    focusNode: _userIDFocusNode,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                    cursorColor: Colors.black,
-                    decoration: InputDecoration(
-                      labelText: language["User Name"] ?? "User Name",
-                      labelStyle: Theme.of(context).textTheme.labelSmall,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                      border: InputBorder.none,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return language["Enter User Name"] ?? "Enter User Name";
-                      }
-                      return null;
-                    },
-                  ),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                Container(
-                  margin: EdgeInsets.only(
-                    left: 16,
-                    right: 16,
-                    bottom: 32,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: _passwordBorderColor,
+                child: TextFormField(
+                  controller: password,
+                  focusNode: _passwordFocusNode,
+                  keyboardType: TextInputType.text,
+                  textInputAction: TextInputAction.done,
+                  obscureText: obscurePassword,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                  cursorColor: Colors.black,
+                  decoration: InputDecoration(
+                    labelText: language["Password"] ?? "Password",
+                    labelStyle: Theme.of(context).textTheme.labelSmall,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
                     ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: TextFormField(
-                    controller: password,
-                    focusNode: _passwordFocusNode,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.done,
-                    obscureText: obscurePassword,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                    cursorColor: Colors.black,
-                    decoration: InputDecoration(
-                      labelText: language["Password"] ?? "Password",
-                      labelStyle: Theme.of(context).textTheme.labelSmall,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                      border: InputBorder.none,
-                      suffixIcon: IconButton(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            obscurePassword = !obscurePassword;
-                          });
-                        },
-                        icon: SvgPicture.asset(
-                          obscurePassword
-                              ? "assets/icons/eye-close.svg"
-                              : "assets/icons/eye.svg",
-                          colorFilter: ColorFilter.mode(
-                            Colors.black,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                      ),
-                    ),
-                    onFieldSubmitted: _handleSubmitted,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return language["Enter Password"] ?? "Enter Password";
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.only(
-                    left: 16,
-                    right: 16,
-                    bottom: 24,
-                  ),
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
+                    border: InputBorder.none,
+                    suffixIcon: IconButton(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 12,
+                        horizontal: 16,
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
+                      onPressed: () {
+                        setState(() {
+                          obscurePassword = !obscurePassword;
+                        });
+                      },
+                      icon: SvgPicture.asset(
+                        obscurePassword
+                            ? "assets/icons/eye-close.svg"
+                            : "assets/icons/eye.svg",
+                        colorFilter: ColorFilter.mode(
+                          Colors.black,
+                          BlendMode.srcIn,
+                        ),
                       ),
-                      backgroundColor: Theme.of(context).primaryColor,
-                    ),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        showLoadingDialog(context);
-                        login();
-                      }
-                    },
-                    child: Text(
-                      language["Log In"] ?? "Log In",
-                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
+                  onFieldSubmitted: _handleSubmitted,
                 ),
-              ],
-            ),
+              ),
+              Container(
+                padding: const EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  bottom: 24,
+                ),
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    backgroundColor: Theme.of(context).primaryColor,
+                  ),
+                  onPressed: () {
+                    if (userid.text.isEmpty) {
+                      ToastUtil.showToast(
+                          0, language["Enter User Name"] ?? "Enter User Name");
+                      return;
+                    }
+                    if (password.text.isEmpty) {
+                      ToastUtil.showToast(
+                          0, language["Enter Password"] ?? "Enter Password");
+                      return;
+                    }
+                    showLoadingDialog(context);
+                    login();
+                  },
+                  child: Text(
+                    language["Log In"] ?? "Log In",
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pos/global.dart';
 import 'package:pos/routes.dart';
+import 'package:pos/src/constants/color_constants.dart';
 import 'package:pos/src/providers/bottom_provider.dart';
 import 'package:pos/src/providers/cart_provider.dart';
 import 'package:provider/provider.dart';
@@ -122,9 +123,9 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
                         Positioned(
                           right: 0,
                           child: Container(
-                            padding: const EdgeInsets.all(2),
+                            padding: const EdgeInsets.all(3),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE3200F),
+                              color: ColorConstants.redColor,
                               borderRadius: BorderRadius.circular(30),
                             ),
                             constraints: const BoxConstraints(

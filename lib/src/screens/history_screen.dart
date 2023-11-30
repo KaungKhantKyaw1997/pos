@@ -257,6 +257,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             const Divider(
                               height: 0,
                               color: Colors.grey,
+                              thickness: 0.2,
                             ),
                             ListView.builder(
                               controller: _scrollController,
@@ -374,6 +375,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                               child: const Divider(
                                                 height: 0,
                                                 color: Colors.grey,
+                                                thickness: 0.2,
                                               ),
                                             )
                                           : Container(),

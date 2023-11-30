@@ -665,6 +665,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     Expanded(
                       child: GridView.builder(
+                        padding: EdgeInsets.zero,
                         controller: _scrollController,
                         shrinkWrap: true,
                         itemCount: items.length,

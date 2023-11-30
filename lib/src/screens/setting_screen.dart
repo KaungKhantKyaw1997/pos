@@ -49,16 +49,9 @@ class _SettingScreenState extends State<SettingScreen> {
         ),
         child: AlertDialog(
           backgroundColor: Colors.white,
-          titlePadding: EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 14,
-          ),
           title: Text(
             language["Log Out"] ?? "Log Out",
             style: Theme.of(context).textTheme.titleLarge,
-          ),
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: 16,
           ),
           content: Text(
             language["Are you sure you want to log out?"] ??
