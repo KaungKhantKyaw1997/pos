@@ -5,8 +5,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:package_info/package_info.dart';
 import 'package:pos/global.dart';
 import 'package:pos/routes.dart';
+import 'package:pos/src/providers/bottom_provider.dart';
 import 'package:pos/src/screens/bottombar_screen.dart';
 import 'package:pos/src/services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -167,6 +169,9 @@ class _SettingScreenState extends State<SettingScreen> {
                           Routes.language,
                           (route) => true,
                         );
+                        BottomProvider bottomProvider =
+                            Provider.of<BottomProvider>(context, listen: false);
+                        bottomProvider.selectIndex(bottomProvider.currentIndex);
                         setState(() {});
                       },
                       child: Padding(
