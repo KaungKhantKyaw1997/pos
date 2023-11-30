@@ -100,9 +100,9 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
         setState(() {
           details["status"] = status;
         });
-        Navigator.pop(context);
         ToastUtil.showToast(response["code"], response["message"]);
       } else {
+        Navigator.pop(context);
         ToastUtil.showToast(response["code"], response["message"]);
       }
     } catch (e, s) {
@@ -280,16 +280,17 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       textBaseline: TextBaseline.alphabetic,
                       children: [
                         Text(
-                          '${language["Order ID"] ?? "Order ID"}: ',
-                          style: Theme.of(context).textTheme.titleMedium,
+                          '${language["Order ID"] ?? "Order ID"}: #${details["id"]}',
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         Text(
-                          '#${details["id"]}',
-                          style: Theme.of(context).textTheme.titleMedium,
+                          '${details["status"]}',
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ],
                     ),
@@ -397,33 +398,35 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.only(
-          left: 16,
-          right: 16,
-          bottom: 24,
-        ),
-        width: double.infinity,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 12,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25),
-            ),
-            backgroundColor: ColorConstants.redColor,
-          ),
-          onPressed: () async {
-            updateOrder("Canceled");
-          },
-          child: Text(
-            language["Cancel Order"] ?? "Cancel Order",
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ),
-      ),
+      bottomNavigationBar: details["status"] == "Pending"
+          ? Container(
+              padding: const EdgeInsets.only(
+                left: 16,
+                right: 16,
+                bottom: 24,
+              ),
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  backgroundColor: ColorConstants.redColor,
+                ),
+                onPressed: () async {
+                  updateOrder("Canceled");
+                },
+                child: Text(
+                  language["Cancel Order"] ?? "Cancel Order",
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+            )
+          : null,
     );
   }
 }

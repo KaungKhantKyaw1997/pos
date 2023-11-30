@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -215,6 +216,61 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  showOrderAlert(code, msg) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (c) => BackdropFilter(
+        filter: ImageFilter.blur(
+          sigmaX: 5,
+          sigmaY: 5,
+        ),
+        child: AlertDialog(
+          backgroundColor: Colors.white,
+          title: Container(
+            width: 200,
+            height: 200,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(code == 200
+                    ? 'assets/images/success.png'
+                    : 'assets/images/error.png'),
+              ),
+            ),
+          ),
+          content: Text(
+            msg,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          actions: [
+            Container(
+              width: double.infinity,
+              child: TextButton(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                      Theme.of(context).primaryColor),
+                ),
+                child: Text(
+                  language["Ok"] ?? "Ok",
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                onPressed: () async {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   createOrder() async {
     showLoadingDialog(context);
     final prefs = await SharedPreferences.getInstance();
@@ -244,10 +300,8 @@ class _HomeScreenState extends State<HomeScreen> {
           totalAmount = 0.0;
           prefs.remove("carts");
         });
-        ToastUtil.showToast(response["code"], response["message"]);
-      } else {
-        ToastUtil.showToast(response["code"], response["message"]);
       }
+      showOrderAlert(response["code"], response["message"]);
     } catch (e) {
       Navigator.pop(context);
       if (e is DioException &&
@@ -269,8 +323,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Routes.unauthorized,
           );
         } else {
-          ToastUtil.showToast(
-              e.response!.data['code'], e.response!.data['message']);
+          showOrderAlert(e.response!.data['code'], e.response!.data['message']);
         }
       }
     }
@@ -428,6 +481,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: const Divider(
                   height: 0,
                   color: Colors.grey,
+                  thickness: 0.2,
                 ),
               )
             : Container(),
@@ -775,7 +829,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: Divider(
                           height: 0,
-                          thickness: 1,
+                          thickness: 0.5,
                         ),
                       ),
                       Padding(

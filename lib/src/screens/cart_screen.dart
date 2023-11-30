@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -139,10 +140,8 @@ class _CartScreenState extends State<CartScreen> {
           totalAmount = 0.0;
           prefs.remove("carts");
         });
-        ToastUtil.showToast(response["code"], response["message"]);
-      } else {
-        ToastUtil.showToast(response["code"], response["message"]);
       }
+      showOrderAlert(response["code"], response["message"]);
     } catch (e) {
       Navigator.pop(context);
       if (e is DioException &&
@@ -164,8 +163,7 @@ class _CartScreenState extends State<CartScreen> {
             Routes.unauthorized,
           );
         } else {
-          ToastUtil.showToast(
-              e.response!.data['code'], e.response!.data['message']);
+          showOrderAlert(e.response!.data['code'], e.response!.data['message']);
         }
       }
     }
@@ -347,6 +345,61 @@ class _CartScreenState extends State<CartScreen> {
               )
             : Container(),
       ],
+    );
+  }
+
+  showOrderAlert(code, msg) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (c) => BackdropFilter(
+        filter: ImageFilter.blur(
+          sigmaX: 5,
+          sigmaY: 5,
+        ),
+        child: AlertDialog(
+          backgroundColor: Colors.white,
+          title: Container(
+            width: 150,
+            height: 150,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(code == 200
+                    ? 'assets/images/success.png'
+                    : 'assets/images/error.png'),
+              ),
+            ),
+          ),
+          content: Text(
+            msg,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          actions: [
+            Container(
+              width: double.infinity,
+              child: TextButton(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                      Theme.of(context).primaryColor),
+                ),
+                child: Text(
+                  language["Ok"] ?? "Ok",
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                onPressed: () async {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

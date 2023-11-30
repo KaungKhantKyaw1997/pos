@@ -30,14 +30,14 @@ class AuthService {
 
   logout(context) async {
     clearData(context);
-    BottomProvider bottomProvider =
-        Provider.of<BottomProvider>(context, listen: false);
-    bottomProvider.selectIndex(0);
-
     Navigator.pushNamed(context, Routes.login);
   }
 
   clearData(context) async {
+    BottomProvider bottomProvider =
+        Provider.of<BottomProvider>(context, listen: false);
+    bottomProvider.selectIndex(0);
+
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.clear();
     await storage.delete(key: "token");
