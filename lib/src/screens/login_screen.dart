@@ -136,11 +136,11 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 400,
-                height: 400,
+                width: 130,
+                height: 130,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('assets/images/login.png'),
+                    image: AssetImage('assets/images/logo.png'),
                   ),
                   shape: BoxShape.circle,
                 ),
@@ -149,6 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.only(
                   left: 16,
                   right: 16,
+                  top: 32,
                   bottom: 24,
                 ),
                 child: Text(
