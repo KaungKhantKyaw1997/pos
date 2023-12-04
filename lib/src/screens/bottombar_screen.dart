@@ -5,6 +5,10 @@ import 'package:pos/routes.dart';
 import 'package:pos/src/constants/color_constants.dart';
 import 'package:pos/src/providers/bottom_provider.dart';
 import 'package:pos/src/providers/cart_provider.dart';
+import 'package:pos/src/screens/cart_screen.dart';
+import 'package:pos/src/screens/history_screen.dart';
+import 'package:pos/src/screens/home_screen.dart';
+import 'package:pos/src/screens/setting_screen.dart';
 import 'package:provider/provider.dart';
 
 class BottomBarScreen extends StatefulWidget {
@@ -43,27 +47,75 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
 
       var data = navItems[index];
       if (data["label"] == 'Home') {
-        Navigator.pushNamedAndRemoveUntil(
+        Navigator.pushAndRemoveUntil(
           context,
-          Routes.home,
+          PageRouteBuilder(
+            pageBuilder: (BuildContext context, Animation<double> animation,
+                Animation<double> secondaryAnimation) {
+              return HomeScreen();
+            },
+            transitionsBuilder: (BuildContext context,
+                Animation<double> animation,
+                Animation<double> secondaryAnimation,
+                Widget child) {
+              return child;
+            },
+            transitionDuration: Duration(seconds: 0),
+          ),
           (route) => false,
         );
       } else if (data["label"] == 'Cart') {
-        Navigator.pushNamedAndRemoveUntil(
+        Navigator.pushAndRemoveUntil(
           context,
-          Routes.cart,
+          PageRouteBuilder(
+            pageBuilder: (BuildContext context, Animation<double> animation,
+                Animation<double> secondaryAnimation) {
+              return CartScreen();
+            },
+            transitionsBuilder: (BuildContext context,
+                Animation<double> animation,
+                Animation<double> secondaryAnimation,
+                Widget child) {
+              return child;
+            },
+            transitionDuration: Duration(seconds: 0),
+          ),
           (route) => false,
         );
       } else if (data["label"] == 'History') {
-        Navigator.pushNamedAndRemoveUntil(
+        Navigator.pushAndRemoveUntil(
           context,
-          Routes.history,
+          PageRouteBuilder(
+            pageBuilder: (BuildContext context, Animation<double> animation,
+                Animation<double> secondaryAnimation) {
+              return HistoryScreen();
+            },
+            transitionsBuilder: (BuildContext context,
+                Animation<double> animation,
+                Animation<double> secondaryAnimation,
+                Widget child) {
+              return child;
+            },
+            transitionDuration: Duration(seconds: 0),
+          ),
           (route) => false,
         );
       } else if (data["label"] == 'Settings') {
-        Navigator.pushNamedAndRemoveUntil(
+        Navigator.pushAndRemoveUntil(
           context,
-          Routes.setting,
+          PageRouteBuilder(
+            pageBuilder: (BuildContext context, Animation<double> animation,
+                Animation<double> secondaryAnimation) {
+              return SettingScreen();
+            },
+            transitionsBuilder: (BuildContext context,
+                Animation<double> animation,
+                Animation<double> secondaryAnimation,
+                Widget child) {
+              return child;
+            },
+            transitionDuration: Duration(seconds: 0),
+          ),
           (route) => false,
         );
       }
