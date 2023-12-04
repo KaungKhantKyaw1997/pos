@@ -222,17 +222,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                           color: Colors.white,
-                          border: Border.all(color: Colors.transparent),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context)
-                                  .primaryColor
-                                  .withOpacity(0.1),
-                              spreadRadius: 0.5,
-                              blurRadius: 7,
-                              offset: Offset(0, 1),
-                            ),
-                          ],
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -251,7 +240,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                     : yesterdayDate == date
                                         ? "Yesterday"
                                         : date,
-                                style: Theme.of(context).textTheme.labelLarge,
+                                style: Theme.of(context).textTheme.labelSmall,
                               ),
                             ),
                             const Divider(
@@ -332,7 +321,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                                           pattern: 'hh:mm a'),
                                                   style: Theme.of(context)
                                                       .textTheme
-                                                      .bodyLarge,
+                                                      .bodySmall,
                                                 ),
                                               ],
                                             ),
@@ -351,7 +340,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                                         ["table_number"],
                                                     style: Theme.of(context)
                                                         .textTheme
-                                                        .bodyLarge,
+                                                        .bodySmall,
                                                   ),
                                                 ),
                                                 Text(
@@ -359,7 +348,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                                       ["status"],
                                                   style: Theme.of(context)
                                                       .textTheme
-                                                      .bodyLarge,
+                                                      .bodySmall,
                                                 ),
                                               ],
                                             ),

@@ -137,30 +137,20 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: 16,
-        vertical: 8,
+        vertical: 16,
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         color: Colors.white,
-        border: Border.all(color: Colors.transparent),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).primaryColor.withOpacity(0.1),
-            spreadRadius: 0.5,
-            blurRadius: 7,
-            offset: Offset(0, 1),
-          ),
-        ],
       ),
       child: Row(
         children: [
           Expanded(
-            flex: 5,
+            flex: 3,
             child: Container(
               margin: EdgeInsets.only(
                 right: 8,
               ),
-              height: 140,
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: NetworkImage(
@@ -176,21 +166,18 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "${items[index]["item_name"]}",
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "${language["Quantity"] ?? "Quantity"}: ",
-                      style: Theme.of(context).textTheme.bodySmall,
+                    Expanded(
+                      child: Text(
+                        "${items[index]["item_name"]}",
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
                     ),
                     Text(
-                      "${items[index]["quantity"]}",
+                      "x${items[index]["quantity"]}",
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ],
@@ -217,7 +204,7 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
                   textBaseline: TextBaseline.alphabetic,
                   children: [
                     Text(
-                      "${language["Total Amount"] ?? "Total Amount"}: ",
+                      "${language["Total"] ?? "Total"}: ",
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                     Expanded(
@@ -380,7 +367,7 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
                 shrinkWrap: true,
                 itemCount: items.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  mainAxisExtent: !useMobileLayout ? 170 : 120,
+                  mainAxisExtent: !useMobileLayout ? 170 : 105,
                   crossAxisSpacing: !useMobileLayout ? 16 : 8,
                   crossAxisCount: !useMobileLayout
                       ? MediaQuery.of(context).orientation ==

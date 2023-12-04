@@ -198,8 +198,8 @@ class _CartScreenState extends State<CartScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 100,
-              height: 100,
+              width: 60,
+              height: 60,
               margin: const EdgeInsets.only(
                 left: 16,
                 right: 8,
@@ -228,103 +228,115 @@ class _CartScreenState extends State<CartScreen> {
                     child: Text(
                       carts[index]["name"].toString(),
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodyLarge,
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      right: 16,
-                      bottom: 8,
-                    ),
-                    child: Text(
-                      carts[index]["description"].toString(),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: Theme.of(context).textTheme.labelLarge,
-                    ),
+                  SizedBox(
+                    height: 4,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(
                       right: 16,
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          "Ks",
-                          style: Theme.of(context).textTheme.bodyLarge,
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.baseline,
+                            textBaseline: TextBaseline.alphabetic,
+                            children: [
+                              Text(
+                                "Ks",
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                              Expanded(
+                                child: FormattedAmount(
+                                  amount: double.parse(
+                                      carts[index]["totalamount"].toString()),
+                                  mainTextStyle:
+                                      Theme.of(context).textTheme.bodyLarge,
+                                  decimalTextStyle:
+                                      Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         SizedBox(
-                          width: 4,
+                          width: 8,
                         ),
-                        FormattedAmount(
-                          amount: double.parse(
-                              carts[index]["totalamount"].toString()),
-                          mainTextStyle: Theme.of(context).textTheme.bodyLarge,
-                          decimalTextStyle:
-                              Theme.of(context).textTheme.bodyLarge,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                              radius: 16,
+                              backgroundColor:
+                                  Theme.of(context).primaryColorLight,
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.remove,
+                                  size: 16,
+                                  color: Colors.black,
+                                ),
+                                onPressed: () {
+                                  if (carts[index]['quantity'] > 1) {
+                                    carts[index]['quantity']--;
+                                    carts[index]['totalamount'] = double.parse(
+                                            carts[index]["price"].toString()) *
+                                        carts[index]['quantity'];
+                                  } else {
+                                    CartProvider cartProvider =
+                                        Provider.of<CartProvider>(context,
+                                            listen: false);
+                                    cartProvider
+                                        .addCount(cartProvider.count - 1);
+                                    carts.removeAt(index);
+                                  }
+                                  calculateTotal();
+                                  saveListToSharedPreferences(carts);
+                                },
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
+                              child: Text(
+                                carts[index]['quantity'].toString(),
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ),
+                            CircleAvatar(
+                              radius: 16,
+                              backgroundColor:
+                                  Theme.of(context).primaryColorLight,
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.add,
+                                  size: 16,
+                                  color: Colors.black,
+                                ),
+                                onPressed: () {
+                                  carts[index]['quantity']++;
+                                  carts[index]['totalamount'] = double.parse(
+                                          carts[index]["price"].toString()) *
+                                      carts[index]['quantity'];
+                                  calculateTotal();
+                                  saveListToSharedPreferences(carts);
+                                },
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          Icons.remove,
-                          size: 24,
-                          color: Colors.black,
-                        ),
-                        onPressed: () {
-                          if (carts[index]['quantity'] > 1) {
-                            carts[index]['quantity']--;
-                            carts[index]['totalamount'] =
-                                double.parse(carts[index]["price"].toString()) *
-                                    carts[index]['quantity'];
-                          } else {
-                            CartProvider cartProvider =
-                                Provider.of<CartProvider>(context,
-                                    listen: false);
-                            cartProvider.addCount(cartProvider.count - 1);
-                            carts.removeAt(index);
-                          }
-                          calculateTotal();
-                          saveListToSharedPreferences(carts);
-                        },
-                      ),
-                      Container(
-                        margin: EdgeInsets.symmetric(
-                          horizontal: 4,
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8,
-                        ),
-                        child: Text(
-                          carts[index]['quantity'].toString(),
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.add,
-                          size: 24,
-                          color: Colors.black,
-                        ),
-                        onPressed: () {
-                          carts[index]['quantity']++;
-                          carts[index]['totalamount'] =
-                              double.parse(carts[index]["price"].toString()) *
-                                  carts[index]['quantity'];
-                          calculateTotal();
-                          saveListToSharedPreferences(carts);
-                        },
-                      ),
-                    ],
                   ),
                 ],
               ),
@@ -507,9 +519,6 @@ class _CartScreenState extends State<CartScreen> {
                       Text(
                         "Ks",
                         style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      SizedBox(
-                        width: 4,
                       ),
                       FormattedAmount(
                         amount: double.parse(totalAmount.toString()),

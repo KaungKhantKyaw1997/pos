@@ -550,7 +550,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Text(
                   items[index]["name"].toString(),
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyLarge,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               ),
             ),
