@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pos/global.dart';
-import 'package:pos/routes.dart';
-import 'package:pos/src/constants/color_constants.dart';
 import 'package:pos/src/providers/bottom_provider.dart';
 import 'package:pos/src/providers/cart_provider.dart';
 import 'package:pos/src/screens/cart_screen.dart';
