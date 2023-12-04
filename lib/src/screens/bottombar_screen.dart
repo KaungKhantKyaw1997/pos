@@ -177,7 +177,7 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(3),
                             decoration: BoxDecoration(
-                              color: ColorConstants.redColor,
+                              color: Theme.of(context).primaryColor,
                               borderRadius: BorderRadius.circular(30),
                             ),
                             constraints: const BoxConstraints(

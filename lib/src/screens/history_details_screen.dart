@@ -367,7 +367,7 @@ class _HistoryDetailsScreenState extends State<HistoryDetailsScreen> {
                 shrinkWrap: true,
                 itemCount: items.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  mainAxisExtent: !useMobileLayout ? 170 : 105,
+                  mainAxisExtent: !useMobileLayout ? 135 : 105,
                   crossAxisSpacing: !useMobileLayout ? 16 : 8,
                   crossAxisCount: !useMobileLayout
                       ? MediaQuery.of(context).orientation ==
