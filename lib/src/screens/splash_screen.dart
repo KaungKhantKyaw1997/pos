@@ -67,10 +67,8 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: WillPopScope(
-        onWillPop: () async {
-          return false;
-        },
+      body: PopScope(
+        canPop: false,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

@@ -15,10 +15,8 @@ class _UnauthorizedScreenState extends State<UnauthorizedScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: WillPopScope(
-        onWillPop: () async {
-          return false;
-        },
+      body: PopScope(
+        canPop: false,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
