@@ -1,6 +1,9 @@
 # Point of Sale
 
-Welcome to our POS App, designed to streamline your business transactions and enhance your efficiency in managing orders.
+Simplify order handling by allowing users to add, edit, or remove items with prices updating
+automatically and quantities customizable. Easily access a detailed history of past orders,
+search, and filter for specific details like dates, items purchased, and total prices for each
+order.
 
 ## Getting Started
 
